@@ -23,6 +23,7 @@ import star from "./star.gif";
 
 import React, { useState } from 'react';
 import { login } from '../services/authService';
+import { useHistory } from "react-router-dom";
 
 const Initial: React.FC = () => {
 
@@ -33,6 +34,7 @@ const Initial: React.FC = () => {
    * Add Title Toolbar and fix it to where you pass in custom components
    */
 
+  const history = useHistory(); // for navigation
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -42,8 +44,12 @@ const Initial: React.FC = () => {
       const userCredential = await login(email, password);
       console.log("Logged in successfully!", userCredential.user);
       // Here you could navigate to another page (e.g., using history.push or IonRouter)
-    } catch (error) {
+      history.push("/home");
+    } catch (error: any) {
       console.error("Login error:", error);
+      if (error.code === "auth/invalid-credential") {
+        setPassword("");
+      }
       // Optionally, show an error message to the user
     }
   };
@@ -75,7 +81,7 @@ const Initial: React.FC = () => {
                     type="text"
                     value={email}
                     placeholder="Username"
-                    onIonChange={(e) => setEmail(e.detail.value!)}
+                    onIonInput={(e) => setEmail(e.detail.value!)}
                   />
                 </IonItem>
                 {/* Password Input */}
@@ -85,14 +91,12 @@ const Initial: React.FC = () => {
                     type="password"
                     value={password}
                     placeholder="Password"
-                    onIonChange={(e) => setPassword(e.detail.value!)}
+                    onIonInput={(e) => setPassword(e.detail.value!)}
                   />
                 </IonItem>
-                <IonRouterLink routerLink="/home">
-                  <IonButton className="hover-solid wide" fill="clear">
-                    Log In
-                  </IonButton>
-                </IonRouterLink>
+                <IonButton className="hover-solid wide" fill="clear" onClick={handleLogin}>
+                  Log In
+                </IonButton>
               </div>
             </IonCardContent>
           </IonCard>
