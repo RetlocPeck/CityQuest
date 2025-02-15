@@ -1,0 +1,153 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
+
+
+.initial-bg {
+    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    overflow: hidden;
+    padding: auto;
+    margin: auto; 
+
+}
+.center-con{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 25%;
+    height:75%
+    
+}
+
+.topalign{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   height: 65%;
+    padding-top: 0;
+    margin-top: 0;
+ 
+    
+}
+.card1 {
+    height: 35%;
+    width: 80%;
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    border-radius: 16px;
+
+}
+
+.card1.signup {
+    height: 40%;
+}
+
+.card2 {
+    height: 5%;
+    width: 80%;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10%;
+    border-radius: 16px;
+}
+
+.card2.signup {
+    height: 15%;
+}
+.buttons {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+
+}
+
+
+.textboxes{
+    margin-bottom: 8px;
+    border: 1px solid gray;
+    border-radius: 2px;
+   background-color: rgb(213, 212, 212);
+   width: 145%;
+    margin-left: -22.5%;
+
+
+}
+
+.textboxes.signup{
+    margin-bottom: 12px;
+    text-align: center;
+    background-color: #d9e7f5;
+}
+
+.hover-solid {
+    color: white; 
+    background-color: #FF6C5F; 
+    border-radius: 12px;
+    width: 90%;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1.2em;
+}
+.hover-solid.wide {
+    margin-top: 10px;
+    width: 100%;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom:40px;
+
+}
+.hover-solid:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+}
+
+.hover-solid.wide:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+
+}
+
+.hover-solid.signup:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+
+}
+
+.initial-title {
+    font-size: 2.9em;
+    text-align: center;
+    font-family: 'Prompt', sans-serif;
+    
+}
+
+.or-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.line {
+    width: 40px;
+    height: 1px;
+    background-color: #878585;
+    margin: 0 10px;
+}
+
+.or-text {
+    color: #878585;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+}

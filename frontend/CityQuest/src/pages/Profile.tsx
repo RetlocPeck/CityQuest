@@ -1,8 +1,7 @@
 import { IonButton, IonCard, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
 import '.././stylesheets/Home.css';
 
-const Home: React.FC = () => {
+const Profile: React.FC = () => {
   return (
     <IonPage>
       <IonHeader>
@@ -34,4 +33,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Profile;
