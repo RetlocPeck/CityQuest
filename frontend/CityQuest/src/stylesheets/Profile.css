@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
+
+
+.initial-bg {
+    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    overflow: hidden;
+    padding: auto;
+    margin: auto; 
+
+}
+
+.profile-card {
+    align-items: center;
+    height: 80%;
+    justify-content: center;
+
+}
+
+.profile-top {
+    display: flex;
+};
+
