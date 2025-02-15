@@ -27,7 +27,7 @@ import {
               <IonTitle>Account Settings</IonTitle>
             </IonToolbar>
           </IonHeader>
-          <IonCard>
+          <IonCard className="main-card">
             <IonCardHeader>
               <IonCardTitle>Edit Profile</IonCardTitle>
             </IonCardHeader>

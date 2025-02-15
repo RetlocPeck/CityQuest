@@ -9,3 +9,9 @@
     margin: auto; 
 
 }
+
+.main-card {
+    align-items: center;
+    height: 80%;
+    justify-content: center;
+}

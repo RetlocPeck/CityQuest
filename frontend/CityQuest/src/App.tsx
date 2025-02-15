@@ -30,7 +30,7 @@ import '@ionic/react/css/display.css';
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
-import { Home, Initial, Achievements, SignUp, Settings} from './pages';
+import { Home, Initial, Achievements, SignUp, Settings, Profile} from './pages';
 
 import './theme/variables.css';
 
@@ -57,6 +57,9 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/settings">
           <Settings/>
+        </Route>
+        <Route exact path="/profile">
+          <Profile/>
         </Route>
       </IonRouterOutlet>
     </IonReactRouter>
