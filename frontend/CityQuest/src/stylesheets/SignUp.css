@@ -1,0 +1,221 @@
+.signup-bg {
+    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    overflow: hidden;
+    height: 100%;
+
+}
+
+html,body {
+    overflow: hidden;
+    height: 100%;
+
+}
+
+.hover-solid:hover {
+    --background: var(--ion-color-primary);
+    --color: white;
+}    
+
+
+.center-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.main-paragraph {
+    margin-top: 10%;
+    padding-left: 10%;
+    padding-right: 10%;
+    margin-bottom: 5%;
+}
+
+
+.card {
+    width: 75%;
+    height: 80%;
+    margin: auto
+}
+
+.buttons {
+    padding-top: 10%;
+}
+
+
+.card-content {
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+.citybox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+    margin-top: 40px;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
+
+
+.initial-bg {
+    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    overflow: hidden;
+    padding: auto;
+    margin: auto; 
+
+}
+.center-con{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 25%;
+    height:75%
+    
+}
+
+.topalign{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   height: 65%;
+    padding-top: 0;
+    margin-top: 0;
+ 
+    
+}
+.card1 {
+    height: 35%;
+    width: 80%;
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+    border-radius: 16px;
+
+}
+
+.card1.signup {
+    height: 40%;
+}
+
+.card2 {
+    height: 5%;
+    width: 80%;
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10%;
+    border-radius: 16px;
+}
+
+.card2.signup {
+    height: 15%;
+}
+.buttons {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+
+}
+
+
+.textboxes{
+    margin-bottom: 8px;
+    border: 1px solid gray;
+    border-radius: 2px;
+   background-color: rgb(213, 212, 212);
+   width: 145%;
+   margin-left: -25%;
+}
+
+.textboxes.signup{
+    margin-bottom: 12px;
+    text-align: center;
+    background-color: #d9e7f5;
+}
+
+.hover-solid {
+    color: white; 
+    background-color: #FF6C5F; 
+    border-radius: 12px;
+    width: 90%;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: 'Jersey 15', sans-serif;
+    font-size: 1.2em;
+}
+.hover-solid.wide {
+    margin-top: 16px;
+    width: 100%;
+    font-size: 1.6em;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom:40px;
+
+}
+.hover-solid:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+}
+
+.hover-solid.wide:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+
+}
+
+.hover-solid.signup:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+
+}
+
+.hover-solid.signup{
+
+    width: 100%;
+    font-size: 1.6em;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.initial-title {
+    font-size: 2.9em;
+    text-align: center;
+    font-family: 'Prompt', sans-serif;
+    margin-bottom: 12px;
+}
+
+.or-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.line {
+    width: 40px;
+    height: 1px;
+    background-color: #878585;
+    margin: 0 10px;
+}
+
+.or-text {
+    color: #878585;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+}

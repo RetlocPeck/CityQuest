@@ -1,6 +1,6 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonCard, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
-import './Home.css';
+import '.././stylesheets/Home.css';
 
 const Home: React.FC = () => {
   return (
@@ -16,7 +16,19 @@ const Home: React.FC = () => {
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer />
+      {/**
+       * 
+       * Map will be on this screen
+       * 
+       * Add a toolbar at bottom that contains buttons for:
+       * - Acccount, Achievments
+       */}
+       <IonCard>
+        <IonToolbar>
+          <IonButton>Account</IonButton>
+          <IonButton>Achievments</IonButton>
+        </IonToolbar>
+        </IonCard>
       </IonContent>
     </IonPage>
   );
