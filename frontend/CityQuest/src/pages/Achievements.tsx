@@ -15,6 +15,7 @@ import {
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
 import star from "./star.gif";
+import shadow from "./shadow.png";
 import "../stylesheets/Achievements.css";
 import { useEffect, useState } from "react";
 
@@ -40,7 +41,7 @@ const Achievements: React.FC = () => {
       <IonPage>
         <IonContent className="a-initial-bg">
           <div className="star">
-            <img src={star} alt="Star animation" style={{ width: "200px" }} />
+            <img src={star} alt="Star animation" style={{ width: "200px"}} />
         
           <IonCard className="a-card"> 
           <div className="a-card-title"> Achievements </div>

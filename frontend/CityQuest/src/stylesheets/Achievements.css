@@ -4,6 +4,7 @@
 
 .a-initial-bg {
     --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+
     overflow: hidden;
     padding: auto;
     margin: auto; 
@@ -36,5 +37,6 @@
     font-size: 1.9em;
     text-align: center;
     font-family: 'Prompt', sans-serif;
+    color: #000000;
   
 }
