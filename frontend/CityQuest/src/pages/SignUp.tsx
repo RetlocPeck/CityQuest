@@ -54,7 +54,7 @@ import {
 
           <IonCard className="signup-card1">
             <IonCardHeader>
-              <IonCardTitle className="signup-initial-title">City Quest</IonCardTitle>
+              <IonCardTitle className="signup-initial-title">CityQuest</IonCardTitle>
             </IonCardHeader>
   
             <IonCardContent className="signup-topalign">

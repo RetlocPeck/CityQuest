@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
+
 @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
 
 
@@ -75,6 +75,8 @@
     border-radius: 2px;
    background-color: rgb(213, 212, 212);
    width: 145%;
+    margin-left: -22.5%;
+
 
 }
 
@@ -91,13 +93,12 @@
     width: 90%;
     margin-left: 10px;
     margin-right: 10px;
-    font-family: 'Jersey 15', sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 1.2em;
 }
 .hover-solid.wide {
-    margin-top: 16px;
+    margin-top: 10px;
     width: 100%;
-    font-size: 1.6em;
     margin-left: 0px;
     margin-right: 0px;
     margin-bottom:40px;
@@ -126,7 +127,6 @@
 .hover-solid.signup{
 
     width: 100%;
-    font-size: 1.6em;
     margin-left: 0px;
     margin-right: 0px;
 }

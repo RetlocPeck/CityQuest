@@ -31,6 +31,7 @@ html,body {
     text-align: center;
     padding: 16px;
     border-radius: 16px;
+    padding-bottom: 28px;
 
 }
 
@@ -70,7 +71,7 @@ html,body {
 }
 
 .signup-card2 {
-    height: 10%;
+    height: 25%;
     width: 80%;
     flex-direction: column;
     display: flex;
@@ -84,21 +85,26 @@ html,body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0px;
-    margin-top: 40px;
+    margin-bottom: 2px;
 }
-
+.signup-hover-solid {
+    color: white; 
+    background-color: #FF6C5F; 
+    border-radius: 12px;
+    width: 90%;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 1em;
+}
 
 .signup-hover-solid.wide {
-    margin-top: 16px;
-    width: 100%;
-    font-size: 1.6em;
+margin-top: 12px;
+    width: 50%;
     margin-left: 0px;
     margin-right: 0px;
-    margin-bottom:40px;
 
 }
-
 .signup-hover-solid.wide:hover {
     --background: #fc4332; 
     --border-radius: 12px;
@@ -106,7 +112,9 @@ html,body {
 
 }
 
-
-
-
-
+.signup-topalign{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0px;
+}
