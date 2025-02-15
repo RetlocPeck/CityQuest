@@ -49,18 +49,18 @@ import {
     return (
       <IonPage>
         <IonContent fullscreen className="signup-bg">
-        <div className="center-con">
+        <div className="signup-center-con">
         <img src= {star} alt="Star animation" style = {{width: "200px"}} />
 
-          <IonCard className="card1 signup">
+          <IonCard className="signup-card1">
             <IonCardHeader>
-              <IonCardTitle className="initial-title">City Quest</IonCardTitle>
+              <IonCardTitle className="signup-initial-title">City Quest</IonCardTitle>
             </IonCardHeader>
   
-            <IonCardContent className="topalign">
-              <div className="buttons">
+            <IonCardContent className="signup-topalign">
+              <div className="signup-buttons">
                 
-                  <input className="textboxes signup"
+                  <input className="signup-textboxes"
                   placeholder="First Name"
                     type="text"
                     value={formData.firstName}
@@ -69,7 +69,7 @@ import {
                     }
                   />
         
-                <input className="textboxes signup"
+                <input className="signup-textboxes"
                   placeholder="Last Name"
                   type="text"
                   value={formData.lastSecond}
@@ -77,7 +77,7 @@ import {
                     setFormData({ ...formData, lastSecond: e.target.value })
                   }
                 />
-                <input className="textboxes signup"
+                <input className="signup-textboxes"
                   placeholder="Email"
                   type="text"
                   value={formData.email}
@@ -85,7 +85,7 @@ import {
                     setFormData({ ...formData, email: e.target.value })
                   }
                 />
-                <input className="textboxes signup"
+                <input className="signup-textboxes"
                   placeholder="Password"
                   type="password"
                   value={formData.password}
@@ -96,13 +96,13 @@ import {
                 </div>
                 </IonCardContent>
                 </IonCard>
-                <IonCard className="card2 signup">
-                <IonCardHeader className = "citybox">
+                <IonCard className="signup-card2">
+                <IonCardHeader className = "signup-citybox">
                     Enter your current city below
                 </IonCardHeader>
-                    <IonCardContent className="topalign">
-                    <div className="buttons">
-                    <input className="textboxes signup"
+                    <IonCardContent className="signup-topalign">
+                    <div className="signup-buttons">
+                    <input className="signup-textboxes"
                   placeholder="City"
                   type="text"
                   value={formData.city}
@@ -114,7 +114,7 @@ import {
                 </div>
                 </IonCardContent>
                 <IonButton
-                  className="hover-solid wide"
+                  className="signup-hover-solid wide"
                   fill="clear"
                   onClick={sendUserData}
                 >
