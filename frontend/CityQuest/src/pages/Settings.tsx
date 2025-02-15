@@ -12,10 +12,8 @@ import {
     IonCol,
     IonCardTitle,
   } from "@ionic/react";
-  import ExploreContainer from "../components/ExploreContainer";
   import { useEffect, useState } from "react";
-  import "../stylesheets/SignUp.css";
-  import "../stylesheets/Initial.css";
+  import "../stylesheets/Settings.css";
   
   const Settings: React.FC = () => {
 
@@ -24,6 +22,33 @@ import {
     return (
       <IonPage>
         <IonContent fullscreen className="signup-bg">
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Account Settings</IonTitle>
+            </IonToolbar>
+          </IonHeader>
+          <IonCard>
+            <IonCardHeader>
+              <IonCardTitle>Edit Profile</IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+              <IonRow>
+                <IonCol>
+                  <IonButton expand="block">Change Username</IonButton>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonButton expand="block">Change Email</IonButton>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonButton expand="block">Change Password</IonButton>
+                </IonCol>
+              </IonRow>
+            </IonCardContent>
+          </IonCard>
         </IonContent>
       </IonPage>
     );
