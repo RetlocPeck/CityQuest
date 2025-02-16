@@ -1,492 +1,365 @@
-import {
-  IonButton,
-  IonIcon,
-  IonCard,
-  IonCol,
-  IonContent,
-  IonPage,
-  IonRow,
-  IonToolbar,
-  IonText,
-} from "@ionic/react";
-import "../stylesheets/Profile.css";
-import { useEffect, useState } from "react";
-import { arrowBackOutline, settingsOutline } from "ionicons/icons";
-import Toolbar from "../components/Toolbar";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, firestore } from "../firebase-config";
-import star from "./pin.png";
-import { onAuthStateChanged } from "@firebase/auth";
-import * as turf from "@turf/turf";
+import React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import * as turf from '@turf/turf'; // For creating circle polygons
+import { getFirestore, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+// Import the image so the bundler handles its URL correctly
+import fogTextureImage from '../images/fogTexture.png';
+import pin from '../pages/jump-pin-unscreen.gif';
+import arrow from '../pages/arrow.png';
+import type { FeatureCollection, Feature, Polygon } from 'geojson';
 
-// --- Helper: Fetch City Area using Overpass API (summing areas of all returned elements) ---
-const fetchCityAreaOverpass = async (pinnedCity: string): Promise<number> => {
-  try {
-    // Split "City, State" into components.
-    const [cityName, state] = pinnedCity.split(",").map((s) => s.trim());
-    console.log(`Debug: Fetching area for ${cityName}, ${state}`);
+const mapboxvar =
+  "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
+mapboxgl.accessToken = mapboxvar;
 
-    // Build Overpass QL query.
-    const query = `
-      [out:json][timeout:25];
-      relation
-        ["name"="${cityName}"]
-        ["boundary"="administrative"]
-        ["admin_level"~"8|9"];
-      out geom;
-    `.trim();
-    console.log("Debug: Overpass query:", query);
+interface MapboxMapProps {
+  location: string | [number, number];
+}
 
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `data=${encodeURIComponent(query)}`,
-    });
+// Helper function: round to 4 decimals (roughly 11 meters)
+const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 
-    const responseText = await response.text();
-    let data;
+// Helper function to save a visited location (if not already present)
+const saveVisitedLocation = async (longitude: number, latitude: number) => {
+  const stored = localStorage.getItem('visitedLocations');
+  const visitedLocations: {
+    longitude: number;
+    latitude: number;
+    timestamp: string;
+    city?: string;
+    state?: string;
+  }[] = stored ? JSON.parse(stored) : [];
+  
+  const exists = visitedLocations.some(
+    (loc) => loc.longitude === longitude && loc.latitude === latitude
+  );
+  
+  if (!exists) {
+    // Build the reverse geocoding URL using Mapbox's API.
+    // We request both "place" (city) and "region" (state) types.
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxvar}&types=place,region`;
     try {
-      data = JSON.parse(responseText);
-    } catch (parseErr) {
-      console.error("Error parsing Overpass response:", parseErr);
-      console.error("Response text was:", responseText);
-      return 0;
-    }
-    console.log("Debug: Overpass response data:", data);
-
-    if (data.elements && data.elements.length > 0) {
-      let totalArea = 0;
-      // Loop over each element returned.
-      data.elements.forEach((element: any, index: number) => {
-        if (element.bounds) {
-          const { minlat, minlon, maxlat, maxlon } = element.bounds;
-          console.log(`Debug: Element ${index} bounds -> minlat: ${minlat}, minlon: ${minlon}, maxlat: ${maxlat}, maxlon: ${maxlon}`);
-          // Construct bbox in format [minX, minY, maxX, maxY] = [minlon, minlat, maxlon, maxlat]
-          const bboxPolygon = turf.bboxPolygon([minlon, minlat, maxlon, maxlat]);
-          const area = turf.area(bboxPolygon);
-          console.log(`Debug: Area for element ${index}: ${area} m²`);
-          totalArea += area;
-        } else {
-          console.warn(`Debug: Element ${index} has no bounds.`);
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      let city = "";
+      let state = "";
+      
+      // Iterate over the returned features to find city and state.
+      if (data.features && Array.isArray(data.features)) {
+        for (const feature of data.features) {
+          if (feature.place_type && feature.place_type.includes("place") && !city) {
+            city = feature.text;
+          }
+          if (feature.place_type && feature.place_type.includes("region") && !state) {
+            state = feature.text;
+          }
+          if (city && state) break;
         }
-      });
-      console.log(`Debug: Total calculated area for ${pinnedCity}: ${totalArea} m²`);
-      return totalArea;
+      }
+      
+      const newEntry = {
+        longitude,
+        latitude,
+        city,
+        state,
+        timestamp: new Date().toISOString(),
+      };
+      visitedLocations.push(newEntry);
+      localStorage.setItem('visitedLocations', JSON.stringify(visitedLocations));
+      console.log('New location saved:', newEntry);
+
+      // Save the new location to Firestore
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(getFirestore(), 'users', user.uid);
+        await updateDoc(userDocRef, {
+          pinnedCities: newEntry
+        });
+      }
+    } catch (err) {
+      console.error("Error during reverse geocoding", err);
     }
-    console.warn("Debug: No elements returned from Overpass for", pinnedCity);
-    return 0;
-  } catch (err) {
-    console.error("Error fetching city area via Overpass", err);
-    return 0;
   }
 };
 
+export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
+  const mapContainer = useRef<HTMLDivElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<{ marker: mapboxgl.Marker; lng: number; lat: number }[]>([]);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
-// --- Constant for tile area (assuming each visited tile is ~22.22m x 22.22m ≈ 493.7 m²) ---
-const TILE_AREA = 493.7;
-
-interface CityStat {
-  city: string; // e.g., "Norman, Oklahoma"
-  unlockedArea: number; // in m²
-  totalArea: number; // in m²
-  percentage: number; // explored percentage
-}
-
-const Profile: React.FC = () => {
-  // Profile states
-  const [error, setError] = useState("");
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [visitationStatuses, setVisitationStatuses] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // New states for pinned cities and city statistics
-  const [pinnedCities, setPinnedCities] = useState<string[]>([]);
-  const [cityStats, setCityStats] = useState<CityStat[]>([]);
-
-  // Listen for auth changes and fetch user profile data
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUserProfile(user.uid);
-      } else {
-        setError("User not authenticated.");
-        setLoading(false);
-      }
+    // Create the map
+    const map = new mapboxgl.Map({
+      container: mapContainer.current as HTMLElement,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-97.4395, 35.2226], // Set initial center to Norman, OK
+      zoom: 16,
+      pitch: 40,
+      bearing: 0,
+      attributionControl: false,
     });
-    return () => unsubscribe();
-  }, []);
 
-  // Fetch user profile from Firestore.
-  // Assumes the document contains displayName, email, and pinnedCities.
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const userDocRef = doc(firestore, "users", userId);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        setName(userData.displayName || "No name found");
-        setEmail(userData.email || "No email found");
-        if (userData.pinnedCities && Array.isArray(userData.pinnedCities)) {
-          setPinnedCities(userData.pinnedCities);
-        }
-      } else {
-        setError("User data not found.");
-      }
-    } catch (e) {
-      console.error(e);
-      setError("Error loading user profile.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Function to get the user's current location
+    const getUserLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('User location:', latitude, longitude);
 
-  // Calculate city statistics based on visited locations and pinned cities.
-  useEffect(() => {
-    if (pinnedCities.length === 0) return;
-
-    const calculateCityStats = async () => {
-      try {
-        const visitedRaw = localStorage.getItem("visitedLocations");
-        const visitedLocations: {
-          longitude: number;
-          latitude: number;
-          city: string;
-          state: string;
-          timestamp: string;
-        }[] = visitedRaw ? JSON.parse(visitedRaw) : [];
-
-        const unlockedCountByCity: { [key: string]: number } = {};
-        visitedLocations.forEach((loc) => {
-          const cityKey = `${loc.city}, ${loc.state}`;
-          if (!unlockedCountByCity[cityKey]) {
-            unlockedCountByCity[cityKey] = 0;
-          }
-          unlockedCountByCity[cityKey] += 1;
-        });
-
-        const stats: CityStat[] = [];
-        for (const pinnedCity of pinnedCities) {
-          const tileCount = unlockedCountByCity[pinnedCity] || 0;
-          const unlockedArea = tileCount * TILE_AREA;
-          // Debug: Log before calling fetchCityAreaOverpass
-          console.log(`Debug: Calculating total area for ${pinnedCity} with ${tileCount} tiles (${unlockedArea} m² unlocked)`);
-          const totalArea = await fetchCityAreaOverpass(pinnedCity);
-          console.log(`Debug: Total area for ${pinnedCity} is ${totalArea} m²`);
-          const percentage = totalArea ? (unlockedArea / totalArea) * 100 : 0;
-          stats.push({
-            city: pinnedCity,
-            unlockedArea,
-            totalArea,
-            percentage,
+          // Move the map to the user's current location
+          map.flyTo({
+            center: [longitude, latitude],
+            zoom: 16,
+            pitch: 40,
+            bearing: 0,
           });
+
+          // Create or update the user marker
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            const userMarkerElement = document.createElement('div');
+            userMarkerElement.style.width = '50px';
+            userMarkerElement.style.height = '50px';
+            userMarkerElement.style.backgroundImage = `url(${arrow})`;
+            userMarkerElement.style.backgroundSize = 'cover';
+
+            userMarkerRef.current = new mapboxgl.Marker(userMarkerElement)
+              .setLngLat([longitude, latitude])
+              .addTo(map);
+          }
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setError('Unable to retrieve location.');
+        },
+        { enableHighAccuracy: true } // High accuracy for more precise location
+      );
+    };
+
+    // This function reads visited locations from localStorage and updates the fog overlay.
+    const updateFogOverlay = () => {
+      try {
+        const stored = localStorage.getItem('visitedLocations');
+        const visitedLocations: { longitude: number; latitude: number }[] = stored
+          ? JSON.parse(stored)
+          : [];
+        console.log('Visited locations:', visitedLocations);
+        // Outer polygon: covers the entire world
+        const outerRing: number[][] = [
+          [-180, -90],
+          [180, -90],
+          [180, 90],
+          [-180, 90],
+          [-180, -90],
+        ];
+
+        // For each visited location, create a circle polygon (11 meters ~ 0.011 km).
+        const holes: number[][][] = visitedLocations
+          .map((loc) => {
+            const circle = turf.circle([loc.longitude, loc.latitude], 0.011, {
+              steps: 64,
+              units: 'kilometers',
+            });
+            if (!circle || !circle.geometry || !circle.geometry.coordinates) {
+              console.error('Invalid circle generated for', loc);
+              return null;
+            }
+            return circle.geometry.coordinates[0] as number[][];
+          })
+          .filter((h): h is number[][] => Boolean(h));
+
+        // Build the new fog polygon, explicitly typing it as a Feature with Polygon geometry.
+        const newFogPolygon: Feature<Polygon> = {
+          type: 'Feature',
+          geometry: {
+            type: 'Polygon',
+            coordinates: holes.length ? [outerRing, ...holes] : [outerRing],
+          },
+          properties: {},
+        };
+
+        // Log the data to be set:
+        console.log('Updating fog with:', newFogPolygon);
+
+        // Build the FeatureCollection data.
+        const newData: FeatureCollection<Polygon> = {
+          type: 'FeatureCollection',
+          features: [newFogPolygon],
+        };
+
+        // Update the fog source data if it exists.
+        const fogSource = map.getSource('fog') as mapboxgl.GeoJSONSource | undefined;
+        if (fogSource && typeof fogSource.setData === 'function') {
+          fogSource.setData(newData);
+          console.log('Fog overlay updated successfully.');
+        } else {
+          console.warn('Fog source not found or setData unavailable.');
         }
-        setCityStats(stats);
       } catch (err) {
-        console.error("Error calculating city stats", err);
+        console.error('Error updating fog overlay:', err);
       }
     };
 
-    calculateCityStats();
-  }, [pinnedCities]);
-
-  // Log pinned cities percentages to the console.
-  useEffect(() => {
-    if (cityStats.length > 0) {
-      console.log("Pinned Cities Exploration Percentages:");
-      cityStats.forEach((stat) => {
-        console.log(`${stat.city}: ${stat.percentage.toFixed(2)}% explored`);
+    // When the map loads, add the fog overlay.
+    map.on('load', () => {
+      // Load the fog texture image.
+      map.loadImage(fogTextureImage, (imgError, image) => {
+        if (imgError) {
+          console.error('Error loading fog texture:', imgError);
+          return;
+        }
+        if (!map.hasImage('fogTexture')) {
+          map.addImage('fogTexture', image!);
+        }
+        // Create the initial world-covering polygon.
+        const worldFog: FeatureCollection<Polygon> = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-180, -90],
+                    [180, -90],
+                    [180, 90],
+                    [-180, 90],
+                    [-180, -90],
+                  ],
+                ],
+              },
+              properties: {},
+            },
+          ],
+        };
+        // Add the fog source and layer.
+        map.addSource('fog', {
+          type: 'geojson',
+          data: worldFog,
+        });
+        map.addLayer({
+          id: 'fog-layer',
+          type: 'fill',
+          source: 'fog',
+          paint: {
+            'fill-pattern': 'fogTexture',
+            'fill-opacity': 0.8,
+          },
+        });
+        // Update the fog overlay on load in case there are any visited locations already saved.
+        updateFogOverlay();
+        getUserLocation();
       });
+    });
+
+    // Watch the user's position.
+    let watchId: number | null = null;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const rawLongitude = position.coords.longitude;
+          const rawLatitude = position.coords.latitude;
+          const longitude = roundCoordinate(rawLongitude);
+          const latitude = roundCoordinate(rawLatitude);
+          saveVisitedLocation(longitude, latitude);
+          updateFogOverlay();
+
+          // Update the user marker position
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          }
+        },
+        (geoError) => {
+          console.error('Geolocation error:', geoError);
+          setError('Error retrieving location.');
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 1000,
+          timeout: 10000,
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by this browser.');
     }
-  }, [cityStats]);
+
+    // (Optional) Handle the location prop to fly to a certain location.
+    const queryLocation = async (locationName: string) => {
+      try {
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+            locationName
+          )}.json?access_token=${mapboxvar}`
+        );
+        const data = await response.json();
+        if (!data.features || data.features.length === 0) {
+          setError('Location not found.');
+          return;
+        }
+        const [longitude, latitude] = data.features[0].center;
+        map.flyTo({
+          center: [longitude, latitude],
+          zoom: 18,
+          pitch: 40,
+          speed: 0.8,
+          curve: 1,
+        });
+      } catch (err) {
+        console.error('Error fetching location:', err);
+      }
+    };
+
+    if (Array.isArray(location)) {
+      map.flyTo({
+        center: location,
+        zoom: 16,
+        pitch: 40,
+      });
+    } else if (typeof location === 'string') {
+      queryLocation(location);
+    }
+
+    // Add navigation controls.
+    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Add click event listener to drop a pin
+    map.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+
+      // Create a custom marker element with the GIF
+      const markerElement = document.createElement('div');
+      markerElement.style.width = '50px';
+      markerElement.style.height = '50px';
+      markerElement.style.backgroundImage = `url(${pin})`;
+      markerElement.style.backgroundSize = 'cover';
+
+      new mapboxgl.Marker(markerElement)
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+      // Save the new location to Firestore
+      saveVisitedLocation(lng, lat);
+    });
+
+    return () => {
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+      map.remove();
+    };
+  }, [location]);
 
   return (
-    <IonPage>
-      <IonContent fullscreen className="profile-bg">
-        <IonToolbar color="clear">
-          <IonButton size="large" color="dark" fill="clear" routerLink="/home">
-            <IonIcon icon={arrowBackOutline}></IonIcon>
-          </IonButton>
-          <IonButton
-            slot="end"
-            color="dark"
-            fill="clear"
-            routerLink="/settings"
-            size="large"
-          >
-            <IonIcon icon={settingsOutline}></IonIcon>
-          </IonButton>
-        </IonToolbar>
-
-        <div className="profile">
-          <IonCard className="card1">
-            <img
-              className="profpic"
-              src={star}
-              alt="Star"
-              style={{ width: "80px" }}
-            />
-            {loading ? (
-              <IonText className="username">Loading...</IonText>
-            ) : (
-              <div className="labels">
-                <div className="username">{name}</div>
-                <div className="email">{email}</div>
-              </div>
-            )}
-          </IonCard>
-          <IonCard className="card2">
-            {visitationStatuses.map((status, index) => (
-              <IonRow key={index}>
-                <IonCol size="12">
-                  <p>{status}</p>
-                </IonCol>
-              </IonRow>
-            ))}
-          </IonCard>
-
-          {/* New Card: Display City Exploration Statistics */}
-          {cityStats.length > 0 && (
-            <IonCard className="card3">
-              <IonRow>
-                <IonCol>
-                  <strong>City</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Unlocked Area (m²)</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Total Area (m²)</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Explored (%)</strong>
-                </IonCol>
-              </IonRow>
-              {cityStats.map((stat, idx) => (
-                <IonRow key={idx}>
-                  <IonCol>{stat.city}</IonCol>
-                  <IonCol>{stat.unlockedArea.toFixed(1)}</IonCol>
-                  <IonCol>{stat.totalArea.toFixed(1)}</IonCol>
-                  <IonCol>{stat.percentage.toFixed(2)}%</IonCol>
-                </IonRow>
-              ))}
-            </IonCard>
-          )}
-        </div>
-        <Toolbar />
-      </IonContent>
-    </IonPage>
+    <div style={{ width: '100%', height: '100%' }}>
+      {error && <div style={{ color: 'red' }}>{error}</div>}
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+    </div>
   );
 };
-
-export default Profile;
-/** 
-    IonButton,
-    IonIcon,
-    IonCard,
-    IonCol,
-    IonContent,
-    IonHeader,
-    IonPage,
-    IonRow,
-    IonTitle,
-    IonToolbar,
-    IonText,
-    IonProgressBar,
-    IonInput,
-    IonLabel,
-  } from "@ionic/react";
-  import ".././stylesheets/Profile.css";
-  import { useEffect, useState } from "react";
-  import { arrowBackOutline, checkmarkOutline, settingsOutline } from "ionicons/icons";
-  import Toolbar from "../components/Toolbar";
-  import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "firebase/firestore";
-  import { app, analytics, auth, firestore, storage } from '../firebase-config';
-  
-  import star from "../assets/pin.png";
-  import { onAuthStateChanged } from "@firebase/auth";
-  
-  const Profile: React.FC = () => {
-    const [error, setError] = useState(""); //Stores the error message if there is one
-    const [name, setName] = useState<string>(""); // Stores the user's name
-    const [email, setEmail] = useState<string>(""); // Stores the user's email
-    const [pinnedCities, setPinnedCities] = useState<any[]>([]); // Stores the pinned cities
-    const [loading, setLoading] = useState<boolean>(true); // Tracks loading state
-    const [newCityName, setNewCityName] = useState<string>(""); // Stores new city name
-    const [showInput, setShowInput] = useState<boolean>(false); // Controls the visibility of the city input
-  
-    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          fetchUserProfile(user.uid);
-          fetchPinnedCities(user.uid); // Fetch pinned cities for the user
-        } else {
-          setError("User not authenticated.");
-          setLoading(false);
-        }
-      });
-  
-      return () => unsubscribe();
-    }, []);
-  
-    const fetchUserProfile = async (userId: string) => {
-      try {
-        const userDocRef = doc(firestore, "users", userId);
-        const userDocSnap = await getDoc(userDocRef);
-  
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          setName(userData.displayName || "No name found");
-          setEmail(userData.email || "No email found");
-        } else {
-          setError("User data not found.");
-        }
-      } catch (e) {
-        console.error(e);
-        setError("Error loading user profile.");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    const fetchPinnedCities = async (userId: string) => {
-        try {
-          const userDocRef = doc(firestore, "users", userId);
-          const userDocSnap = await getDoc(userDocRef);
-      
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-            setPinnedCities(userData?.pinnedCities || []); // Fetch the pinned cities array
-          } else {
-            setError("User data not found.");
-          }
-        } catch (e) {
-          console.error(e);
-          setError("Error loading pinned cities.");
-        }
-      };
-      
-      
-  
-    // Function to calculate the exploration progress for a city
-    const calculateProgress = (city: any) => {
-      const totalLocations = city.totalLocations || 1;
-      const visitedLocations = city.visitedLocations || 0;
-      return (visitedLocations / totalLocations) * 100;
-    };
-  
-    const addCity = async () => {
-        if (!newCityName) {
-          setError("Please enter a city name.");
-          return;
-        }
-      
-        const userId = auth.currentUser?.uid;
-        if (!userId) {
-          setError("User not authenticated.");
-          return;
-        }
-      
-        try {
-          const userDocRef = doc(firestore, "users", userId);
-          await setDoc(
-            userDocRef,
-            {
-              pinnedCities: [...pinnedCities, newCityName], // Add new city to the array
-            },
-            { merge: true } // Merge with existing data, so other fields aren't overwritten
-          );
-      
-          setPinnedCities((prev) => [...prev, newCityName]);
-          setNewCityName(""); // Clear input after adding city
-          setShowInput(false); // Hide the input field
-        } catch (e) {
-          console.error(e);
-          setError("Error adding city.");
-        }
-      };
-      
-  
-    return (
-      <IonPage>
-        <IonContent fullscreen className="profile-bg">
-          <IonToolbar color="clear">
-            <IonButton size="large" color="dark" fill="clear" routerLink="/home">
-              <IonIcon icon={arrowBackOutline}></IonIcon>
-            </IonButton>
-            <IonButton
-              slot="end"
-              color="dark"
-              fill="clear"
-              routerLink="/settings"
-              size="large"
-            >
-              <IonIcon icon={settingsOutline}></IonIcon>
-            </IonButton>
-          </IonToolbar>
-  
-          <div className="profile">
-            <IonCard className="card1">
-              <img className="profpic" src={star} alt="Star" style={{ width: "80px" }} />
-              {loading ? (
-                <IonText className="username">Loading...</IonText>
-              ) : (
-                <div className="labels">
-                  <div className="username">{name}</div>
-                  <div className="email">{email}</div>
-                </div>
-              )}
-            </IonCard>
-  
-            <IonCard className="card2">
-            {pinnedCities.map((city, index) => (
-  <IonRow key={index}>
-    <IonCol size="12">
-        <div className="progress">
-<<<<<<< HEAD
-        <p className = "cityname">{city} </p>
-          <p className = "cityname">{city} </p>{/* City is now a string in this case *//**}
->
-      <IonProgressBar className = "bars" value={calculateProgress(city) / 100} />
-      <p >{calculateProgress(city).toFixed(2)}% explored</p>
-      </div>
-    </IonCol>
-  </IonRow>
-))}
-
-  
-              {showInput ? (
-                <div>
-                  <IonInput
-                    value={newCityName}
-                    onIonChange={(e) => setNewCityName(e.detail.value!)}
-                    placeholder="City name"
-                  />
-                <IonIcon icon={checkmarkOutline} color="dark"onClick={() => {
-    addCity(); 
-    setShowInput(false); 
-  }}></IonIcon>
-                </div>
-              ) : (
-                <IonButton className="profile-hover-solid" fill="clear" onClick={() => setShowInput(true)}>
-                  Add City
-                </IonButton>
-              )}
-            </IonCard>
-          </div>
-  
-          <Toolbar />
-        </IonContent>
-      </IonPage>
-    );
-  };
-  
-  export default Profile;
-  
-<<<<<<< HEAD
->>>>>>> a59db320262eb63a37f408167b45931b864f87db
-=======
-**/
-

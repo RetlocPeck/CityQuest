@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-
 import * as turf from '@turf/turf'; // For creating circle polygons
 import { getFirestore, doc, updateDoc, getDoc} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
@@ -21,7 +20,6 @@ interface MapboxMapProps {
   location: string | [number, number];
 }
 
-
 // Helper function: calculate distance between two coordinates
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371e3; // Earth radius in meters
@@ -39,7 +37,6 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 };
 
 // Helper function: round to 4 decimals (roughly 11 meters)
-
 const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 
 /**
@@ -210,7 +207,6 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       map.resize(); // Forces the map to adjust to its container
     });
 
-
     // 2. Create and add the user marker.
     const userMarkerEl = document.createElement('div');
     userMarkerEl.className = 'user-marker';
@@ -224,186 +220,6 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       .setLngLat([-97.4395, 35.2226])
       .addTo(map);
 
-    // 3. On map load, load the fog texture and fog overlay.
-
-/**
-    // Function to get the user's current location
-    const getUserLocation = () => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          if (previousLatitude.current !== null && previousLongitude.current !== null) {
-            const distance = calculateDistance(
-              previousLatitude.current,
-              previousLongitude.current,
-              latitude,
-              longitude
-            );
-            setDistanceTraveled((prevDistance) => prevDistance + distance);
-
-            // Update the distanceTravelled field in Firebase
-            const auth = getAuth();
-            const user = auth.currentUser;
-            console.log('User:', user);
-            if (user) {
-              const db = getFirestore();
-              const userDocRef = doc(db, 'users', user.uid);
-              updateDoc(userDocRef, {
-                distanceTravelled: distanceTraveled + distance,
-              });
-            }
-          }
-
-          // Update previous coordinates
-          previousLatitude.current = latitude;
-          previousLongitude.current = longitude;
-
-          // Move the map to the user's current location
-          map.flyTo({
-            center: [longitude, latitude],
-            zoom: 16,
-            pitch: 40,
-            bearing: 0,
-          });
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-          setError('Unable to retrieve location.');
-        },
-        { enableHighAccuracy: true } // High accuracy for more precise location
-      );
-    };
-
-    // Function to handle map click and update user position
-    const handleMapClick = async (e: mapboxgl.MapMouseEvent) => {
-      const { lng: longitude, lat: latitude } = e.lngLat;
-      console.log('Clicked at:', longitude, latitude);
-
-      // Calculate distance if previous coordinates are available
-      if (previousLatitude.current !== null && previousLongitude.current !== null) {
-        const distance = calculateDistance(
-          previousLatitude.current,
-          previousLongitude.current,
-          latitude,
-          longitude
-        );
-        //setDistanceTraveled((prevDistance) => prevDistance + distance);
-
-        // Update the distanceTravelled field in Firebase
-        const auth = getAuth();
-const user = auth.currentUser;
-
-if (user) {
-  const db = getFirestore();
-  const userDocRef = doc(db, 'users', user.uid); 
-
-  // Get the document data
-  const userData = await getDoc(userDocRef);
-  
-  if (userData.exists()) {
-    // Retrieve the current distanceTravelled
-    const currentDistance = userData.data().distanceTravelled || 0;
-    
-    // Update the distance in the Firestore document
-    setDistanceTraveled(currentDistance + distance);
-    await updateDoc(userDocRef, {
-      distanceTravelled: currentDistance + distance,  // Add the new distance
-    });
-
-        }
-      }
-    };
-
-      // Update previous coordinates
-      previousLatitude.current = latitude;
-      previousLongitude.current = longitude;
-
-      // Move the map to the new location
-      map.flyTo({
-        center: [longitude, latitude],
-        zoom: 16,
-        pitch: 40,
-        bearing: 0,
-      });
-
-      // Save the visited location
-      saveVisitedLocation(longitude, latitude);
-    };
-
-    // Add click event listener to the map
-    map.on('click', handleMapClick);
-
-    // This function reads visited locations from localStorage and updates the fog overlay.
-    const updateFogOverlay = () => {
-      try {
-        const stored = localStorage.getItem('visitedLocations');
-        const visitedLocations: { longitude: number; latitude: number }[] = stored
-          ? JSON.parse(stored)
-          : [];
-        console.log('Visited locations:', visitedLocations);
-        // Outer polygon: covers the entire world
-        const outerRing: number[][] = [
-          [-180, -90],
-          [180, -90],
-          [180, 90],
-          [-180, 90],
-          [-180, -90],
-        ];
-
-        // For each visited location, create a circle polygon (11 meters ~ 0.011 km).
-        const holes: number[][][] = visitedLocations
-          .map((loc) => {
-            const circle = turf.circle([loc.longitude, loc.latitude], 0.011, {
-              steps: 64,
-              units: 'kilometers',
-            });
-            if (!circle || !circle.geometry || !circle.geometry.coordinates) {
-              console.error('Invalid circle generated for', loc);
-              return null;
-            }
-            return circle.geometry.coordinates[0] as number[][];
-          })
-          .filter((h): h is number[][] => Boolean(h));
-
-        // Build the new fog polygon, explicitly typing it as a Feature with Polygon geometry.
-        const newFogPolygon: Feature<Polygon> = {
-          type: 'Feature',
-          geometry: {
-            type: 'Polygon',
-            coordinates: holes.length ? [outerRing, ...holes] : [outerRing],
-          },
-          properties: {},
-        };
-
-        // Log the data to be set:
-        console.log('Updating fog with:', newFogPolygon);
-
-        // Build the FeatureCollection data.
-        const newData: FeatureCollection<Polygon> = {
-          type: 'FeatureCollection',
-          features: [newFogPolygon],
-        };
-
-        // Update the fog source data if it exists.
-        const fogSource = map.getSource('fog') as mapboxgl.GeoJSONSource | undefined;
-        if (fogSource && typeof fogSource.setData === 'function') {
-          fogSource.setData(newData);
-          console.log('Fog overlay updated successfully.');
-        } else {
-          console.warn('Fog source not found or setData unavailable.');
-        }
-      } catch (err) {
-        console.error('Error updating fog overlay:', err);
-      }
-    };
-<<<<<<< HEAD
-
-    // When the map loads, add the fog overlay.
->>>>>>> a59db320262eb63a37f408167b45931b864f87db
-=======
-**/
-
-    // 3. On map load, load the fog texture and fog overlay.
     map.on('load', () => {
       map.loadImage(fogTextureImage, (imgError, image) => {
         if (imgError) {
@@ -488,7 +304,19 @@ if (user) {
     // 8. Add navigation controls.
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // 9. Cleanup on component unmount.
+    // 9. Add click event listener to update user location.
+    map.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+      const roundedLon = roundCoordinate(lng);
+      const roundedLat = roundCoordinate(lat);
+
+      console.log('Map clicked at:', roundedLat, roundedLon);
+      userMarker.setLngLat([lng, lat]);
+      saveVisitedLocation(roundedLon, roundedLat);
+      loadFogOverlay(map);
+    });
+
+    // 10. Cleanup on component unmount.
     return () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
