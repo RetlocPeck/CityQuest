@@ -16,7 +16,7 @@ import {
 import ExploreContainer from "../components/ExploreContainer";
 
 import "../stylesheets/Initial.css";
-import star from "./star.gif";
+import star from "./sparkles.gif";
 
 const Initial: React.FC = () => {
   /**

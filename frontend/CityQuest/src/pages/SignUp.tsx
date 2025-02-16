@@ -16,7 +16,7 @@ import {
   import { useEffect, useState } from "react";
   import "../stylesheets/SignUp.css";
 
-  import star from "./star.gif";
+  import star from "./sparkles.gif";
   const SignUp: React.FC = () => {
 
 
