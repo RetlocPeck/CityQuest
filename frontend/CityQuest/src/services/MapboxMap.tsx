@@ -25,9 +25,10 @@ export const MapboxMap: React.FC = () => {
         exaggeration: 1.5, // Exaggeration of the terrain's height
       });
 
+      /** 
       // Add 3D buildings
       map.addLayer({
-        id: '3d-buildings',
+        id: '2d-buildings',
         type: 'fill-extrusion',
         source: 'composite',
         'source-layer': 'building',
@@ -38,7 +39,30 @@ export const MapboxMap: React.FC = () => {
           'fill-extrusion-opacity': 0.6, // Transparency of buildings
         },
       });
+      */
     });
+    
+
+    // Function to query the location by name (geocoding)
+    const queryLocation = async (locationName: string) => {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationName)}.json?access_token=${mapboxvar}`
+      );
+      const data = await response.json();
+      const [longitude, latitude] = data.features[0].center; // Get the coordinates from the first result
+
+      // Move the map to the queried location with 3D effect
+      map.flyTo({
+        center: [longitude, latitude],
+        zoom: 18, // Set zoom level to an appropriate value
+        pitch: 45, // Tilt to maintain 3D effect
+        speed: 0.8, // Smooth flying animation
+        curve: 1, // Flight curve for smooth transition
+      });
+    };
+
+    // Example usage: Query a location by name and fly to it
+    queryLocation('Oklahoma'); // You can change this to any location name
 
     // Optional: Add navigation controls for zoom and rotation
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
