@@ -188,16 +188,16 @@ const loadFogOverlay = (map: mapboxgl.Map) => {
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const previousLatitude = useRef<number | null>(null);
-  const previousLongitude = useRef<number | null>(null);
+  let previousLatitude = useRef<number | null>(null);
+  let previousLongitude = useRef<number | null>(null);
   const [distanceTraveled, setDistanceTraveled] = useState(0);
-
+  let previous_location = [-97.4395, 35.2226]
   useEffect(() => {
     // 1. Create the map.
     const map = new mapboxgl.Map({
       container: mapContainer.current as HTMLElement,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-97.4395, 35.2226], // Norman, OK
+      center: previous_location, // Norman, OK
       zoom: 16,
       pitch: 40,
       bearing: 0,
@@ -217,7 +217,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     userMarkerEl.style.border = '2px solid white';
     userMarkerEl.style.boxShadow = '0 0 5px rgba(0,0,0,0.5)';
     const userMarker = new mapboxgl.Marker({ element: userMarkerEl })
-      .setLngLat([-97.4395, 35.2226])
+      .setLngLat(previous_location)
       .addTo(map);
 
     map.on('load', () => {
@@ -241,6 +241,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       const lat = roundCoordinate(rawLat);
     
       console.log('User location:', lat, lon);
+      previous_location = [lon, lat];
       map.setCenter([rawLon, rawLat]);
       userMarker.setLngLat([rawLon, rawLat]);
     
@@ -340,6 +341,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
           return;
         }
         const [longitude, latitude] = data.features[0].center;
+        previous_location = [longitude, latitude];
         map.flyTo({
           center: [longitude, latitude],
           zoom: 18,
