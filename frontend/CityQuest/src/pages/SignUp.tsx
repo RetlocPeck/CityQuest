@@ -12,6 +12,7 @@ import {
   IonCol,
   IonCardTitle,
 } from "@ionic/react";
+import { useHistory } from "react-router-dom";
 import ExploreContainer from "../components/ExploreContainer";
 import { useEffect, useState } from "react";
 import "../stylesheets/SignUp.css";
@@ -20,11 +21,8 @@ import { signUp } from '../services/authService';
 import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
 import star from "./sparkles.gif";
+
 const SignUp: React.FC = () => {
-
-
-  const validate = () => {};
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastSecond: "",
@@ -33,8 +31,16 @@ const SignUp: React.FC = () => {
     city: "",
   });
 
+const history = useHistory();
+const goToHome = () => {
+  history.push("/home");
+};
+
   const handleSignup = async () => {
       var user;
+      
+
+      
       try {
         const userCredential = await signUp(formData.email, formData.password);
         console.log("Signed up successfully!", userCredential.user);
@@ -45,8 +51,9 @@ const SignUp: React.FC = () => {
           createdAt: new Date(),
           displayName: formData.firstName + " " + formData.lastSecond,
           pinnedCities: [formData.city],
+          distanceTraveled: 0,
         });
-        //setDoc()
+        goToHome();
       } catch (error) {
         console.error("Signup error:", error);
         // Optionally, show an error message to the user
@@ -75,7 +82,7 @@ const SignUp: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="signup-bg">
       <div className="signup-center-con">
-      <img src= {star} alt="Star animation" style = {{width: "200px"}} />
+      <img src= {star} alt="Star animation" style = {{width: "150px"}} />
 
         <IonCard className="signup-card1">
           <IonCardHeader>
@@ -123,7 +130,7 @@ const SignUp: React.FC = () => {
               </IonCard>
               <IonCard className="signup-card2">
               <IonCardHeader className = "signup-citybox">
-                  Enter your current city below
+                  Enter your current city below:
               </IonCardHeader>
                   <IonCardContent className="signup-topalign">
                   <div className="signup-buttons">
