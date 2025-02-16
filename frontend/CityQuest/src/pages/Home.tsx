@@ -2,7 +2,7 @@ import { IonButton, IonCard, IonContent, IonHeader, IonPage, IonSearchbar, IonTi
 import ExploreContainer from '../components/ExploreContainer';
 import '.././stylesheets/Home.css';
 import Toolbar from '../components/Toolbar';
-
+import  {MapboxMap } from '../services/MapboxMap';
 const Home: React.FC = () => {
   return (
     <>
@@ -19,7 +19,7 @@ const Home: React.FC = () => {
        * - Acccount, Achievments
        */}
        
-
+        <MapboxMap/>
       </IonContent>
       <Toolbar />
     </IonPage>
