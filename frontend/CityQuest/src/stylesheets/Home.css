@@ -1,7 +1,38 @@
-.home-bg{
-    height: 100vh;
+.home-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.home-center-con {
-    height: 83%;
+.map-container {
+  position:absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height:80vh;
+  z-index: -1; /* Ensures the map is behind everything */
+}
+
+.searchbar {
+  position: relative;
+  z-index: 10;
+  margin-top: 10px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.suggestions-list {
+  position: relative;
+  z-index: 10;
+  background: white;
+}
+
+.toolbar {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
 }

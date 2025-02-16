@@ -270,7 +270,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   return (
     <div>
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div ref={mapContainer} style={{ width: '100%', height: '500px' }} />
+      <div ref={mapContainer} style={{ width: '100%', height: '900px' }} />
     </div>
   );
 };
