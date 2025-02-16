@@ -16,6 +16,8 @@ import { login } from '../services/authService'; // Import login function
 import { useHistory } from "react-router-dom";
 import "../stylesheets/Initial.css";
 import star from "../assets/pin.png";
+import birds from "../assets/bird.gif";
+
 
 const Initial: React.FC = () => {
   const history = useHistory(); // For navigation
@@ -50,10 +52,29 @@ const Initial: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="initial-initial-bg">
         <div className="initial-center-con">
-          {/*TOP CARD*/}
+
           <IonCard className="initial-card1">
-            <img src={star} alt="Star animation" style={{ width: "70px" }} />
-            {/*CITY QUEST LABEL*/}
+          <img 
+  src={star} 
+  alt="Star animation" 
+  style={{ 
+    width: "70px", 
+    animation: "wobble 3s infinite ease-in-out" 
+  }} 
+/>
+
+<style>
+  {`
+    @keyframes wobble {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+  `}
+</style>
+            
             <IonCardHeader>
               <IonCardTitle className="initial-initial-title">
                 Sign in with email
