@@ -2,14 +2,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
 
 
-.initial-bg {
+.initial-initial-bg {
     --background: linear-gradient(to bottom, #0571d3, #bad4ec);
     overflow: hidden;
     padding: auto;
     margin: auto; 
 
 }
-.center-con{
+.initial-center-con{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -18,7 +18,7 @@
     
 }
 
-.topalign{
+.initial-topalign{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -28,7 +28,7 @@
  
     
 }
-.card1 {
+.initial-card1 {
     height: 45%;
     width: 80%;
     flex-direction: column;
@@ -41,11 +41,11 @@
 
 }
 
-.card1.signup {
+.initial-card1.signup {
     height: 40%;
 }
 
-.card2 {
+.initial-card2 {
     height: 5%;
     width: 80%;
     flex-direction: column;
@@ -56,10 +56,10 @@
     border-radius: 16px;
 }
 
-.card2.signup {
+.initial-card2.signup {
     height: 15%;
 }
-.buttons {
+.initial-buttons {
     margin-bottom: 16px;
     display: flex;
     justify-content: center;
@@ -69,7 +69,7 @@
 }
 
 
-.textboxes{
+.initial-textboxes{
     margin-bottom: 8px;
     border: 1px solid gray;
     border-radius: 2px;
@@ -80,13 +80,13 @@
 
 }
 
-.textboxes.signup{
+.initial-textboxes.signup{
     margin-bottom: 12px;
     text-align: center;
     background-color: #d9e7f5;
 }
 
-.hover-solid {
+.initial-hover-solid {
     color: white; 
     background-color: #FF6C5F; 
     border-radius: 12px;
@@ -96,7 +96,7 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 1.2em;
 }
-.hover-solid.wide {
+.initial-hover-solid.wide {
 
     margin-top: 20px;
     width: 50%;
@@ -106,27 +106,27 @@
     margin-bottom:40px;
 
 }
-.hover-solid:hover {
+.initial-hover-solid:hover {
     --background: #fc4332; 
     --border-radius: 12px;
     color: white; 
 }
 
-.hover-solid.wide:hover {
-    --background: #fc4332; 
-    --border-radius: 12px;
-    color: white; 
-
-}
-
-.hover-solid.signup:hover {
+.initial-hover-solid.wide:hover {
     --background: #fc4332; 
     --border-radius: 12px;
     color: white; 
 
 }
 
-.initial-title {
+.initial-hover-solid.signup:hover {
+    --background: #fc4332; 
+    --border-radius: 12px;
+    color: white; 
+
+}
+
+.initial-initial-title {
     font-size: 2.9em;
     text-align: center;
     font-family: 'Prompt', sans-serif;
@@ -134,7 +134,7 @@
     
 }
 
-.input{
+.initial-input{
     margin-bottom: 8px;
     border: 1px solid gray;
     border-radius: 2px;
@@ -142,14 +142,14 @@
     text-align: center;
 }
 
-.or-container {
+.initial-or-container {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
 }
 
-.line {
+.initial-line {
     width: 40px;
     height: 1px;
     background-color: #878585;
