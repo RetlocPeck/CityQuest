@@ -1,6 +1,7 @@
-import { IonButton, IonCard, IonCol, IonContent, IonHeader, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonIcon, IonCard, IonCol, IonContent, IonHeader, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
 import '.././stylesheets/Profile.css';
 import { useEffect, useState } from 'react';
+import { arrowBackOutline } from 'ionicons/icons';
 
 const Profile: React.FC = () => {
 
@@ -25,8 +26,9 @@ const Profile: React.FC = () => {
         <IonCard>
             <IonRow>
                 <IonToolbar>
-                <IonButton >Back</IonButton>
-                    <IonButton slot='end'>Settings</IonButton>
+                    <IonButton fill='clear' routerLink='/home'>
+                    <IonIcon icon={arrowBackOutline}></IonIcon>
+                    </IonButton>
                 </IonToolbar>
             </IonRow>
             
