@@ -33,8 +33,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       // Move the map to the queried location with 2D view
       map.flyTo({
         center: [longitude, latitude],
-        zoom: 16, // Set zoom level to an appropriate value
-        pitch: 0, // No tilt for 2D view
+        zoom: 18, // Set zoom level to an appropriate value
+        pitch: 40, // No tilt for 2D view
         speed: 0.8, // Smooth flying animation
         curve: 1, // Flight curve for smooth transition
       });
@@ -53,6 +53,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       queryLocation(location);
     }
 
+    
     // Optional: Add navigation controls for zoom and rotation
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
