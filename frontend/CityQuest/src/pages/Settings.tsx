@@ -11,10 +11,12 @@ import {
     IonRow,
     IonCol,
     IonCardTitle,
+    IonIcon,
   } from "@ionic/react";
    
   import { useEffect, useState } from "react";
   import "../stylesheets/Settings.css";
+  import { arrowBackOutline } from "ionicons/icons";
   
   const Settings: React.FC = () => {
 
@@ -30,6 +32,12 @@ import {
           </IonHeader>
           <IonCard className="main-card">
             <IonCardHeader>
+              <IonToolbar>
+              <IonButton size='large' fill='clear' routerLink='/home'>
+              <IonIcon icon={arrowBackOutline}></IonIcon>
+            </IonButton>
+              </IonToolbar>
+
               <IonCardTitle>Edit Profile</IonCardTitle>
             </IonCardHeader>
             <IonCardContent>
