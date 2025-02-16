@@ -21,11 +21,10 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { signUp } from '../services/authService';
 import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
-<<<<<<< HEAD
-import star from "./pin.png";
-=======
+
+
 import star from "./sparkles.gif";
->>>>>>> mapbox
+
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -87,11 +86,9 @@ const goToHome = () => {
     <IonPage>
       <IonContent fullscreen className="signup-bg">
       <div className="signup-center-con">
-<<<<<<< HEAD
-    
-=======
+
       <img src= {star} alt="Star animation" style = {{width: "150px"}} />
->>>>>>> mapbox
+
 
         <IonCard className="signup-card1">
         <img src= {star} alt="Star animation" style = {{width: "70px"}} />
@@ -138,11 +135,9 @@ const goToHome = () => {
               </IonCardContent>
               </IonCard>
               <IonCard className="signup-card2">
-<<<<<<< HEAD
-              <IonCardHeader className = "signup-initial-body city">
-=======
+
               <IonCardHeader className = "signup-citybox">
->>>>>>> mapbox
+                
                   Enter your current city below:
               </IonCardHeader>
                   <IonCardContent className="signup-topalign">

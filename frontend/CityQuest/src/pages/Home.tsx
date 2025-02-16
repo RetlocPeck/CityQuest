@@ -17,30 +17,11 @@ import Toolbar from '../components/Toolbar';
 import { MapboxMap } from '../services/MapboxMap';
 
 const Home: React.FC = () => {
-<<<<<<< HEAD
-  return (
-    <>
-    <IonPage>
-     <IonContent fullscreen className = "home-bg">
-     <IonSearchbar style={{ paddingTop: "16px", '--border-radius': '20px', "--height": "60px", }} color = "medium">
-        </IonSearchbar>
-    <div className="home-center-con"> 
-    </div>
-      {/**
-       * 
-       * Map will be on this screen
-       * 
-       * Add a toolbar at bottom that contains buttons for:
-       * - Acccount, Achievments
-       */}
-        <Toolbar />
-=======
   // State for the search query, suggestions and selected location.
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   // Default location can be a name or coordinates; here we use "Oklahoma City" as default.
   const [selectedLocation, setSelectedLocation] = useState<string | [number, number]>("Oklahoma City");
->>>>>>> mapbox
 
   // Update suggestions when the user types into the search bar.
   const handleSearchChange = async (event: CustomEvent) => {
@@ -102,6 +83,7 @@ const Home: React.FC = () => {
         {/* Pass the selected location to MapboxMap */}
         <MapboxMap location={selectedLocation} />
       </IonContent>
+      <Toolbar/>
      
     </IonPage>
   );
