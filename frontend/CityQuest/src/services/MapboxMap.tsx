@@ -1,18 +1,16 @@
-// src/components/MapboxMap.js
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import dotenv from 'dotenv';
 dotenv.config();
-mapboxgl.accessToken = process.env.MAP_BOX_TOKEN; // Add your Mapbox access token here
-//mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; // Add your Mapbox access token here
+mapboxgl.accessToken = process.env.MAP_BOX_TOKEN;
 
-const MapboxMap = () => {
-  const mapContainer = useRef(null); // Reference to the div that will contain the map
+export const MapboxMap: React.FC = () => {
+  const mapContainer = useRef<HTMLDivElement | null>(null); // Reference to the div that will contain the map
 
   useEffect(() => {
     // Initialize the map when the component is mounted
     const map = new mapboxgl.Map({
-      container: mapContainer.current, // The DOM element to contain the map
+      container: mapContainer.current as HTMLElement, // The DOM element to contain the map
       style: 'mapbox://styles/mapbox/streets-v11', // Style of the map
       center: [-74.5, 40], // Starting position [longitude, latitude]
       zoom: 9, // Starting zoom level
@@ -32,5 +30,3 @@ const MapboxMap = () => {
     />
   );
 };
-
-export default MapboxMap;
