@@ -1,21 +1,24 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 import * as turf from '@turf/turf'; // For creating circle polygons
 import { getFirestore, doc, updateDoc, getDoc} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 // Import the image so the bundler handles its URL correctly
 import fogTextureImage from '../images/fogTexture.png';
 
-import type { FeatureCollection, Feature, Polygon } from 'geojson';
+import type { Feature, FeatureCollection, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
 
-const mapboxvar =
+// Mapbox access token
+const mapboxAccessToken =
   "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
-mapboxgl.accessToken = mapboxvar;
+mapboxgl.accessToken = mapboxAccessToken;
 
 interface MapboxMapProps {
   location: string | [number, number];
 }
+
 
 // Helper function: calculate distance between two coordinates
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -36,24 +39,150 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 // Helper function: round to 4 decimals (roughly 11 meters)
 const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 
-// Helper function to save a visited location (if not already present)
-const saveVisitedLocation = (longitude: number, latitude: number) => {
+/**
+ * Saves a visited location (rounded to 4 decimals) in localStorage,
+ * ensuring no duplicate entries.
+ *
+ * This function now also performs a reverse geocoding lookup so that
+ * the city and state at the given coordinates are saved along with the
+ * longitude, latitude, and timestamp.
+ */
+const saveVisitedLocation = async (longitude: number, latitude: number) => {
   const stored = localStorage.getItem('visitedLocations');
-  const visitedLocations: { longitude: number; latitude: number; timestamp: string }[] =
-    stored ? JSON.parse(stored) : [];
+  const visitedLocations: {
+    longitude: number;
+    latitude: number;
+    timestamp: string;
+    city?: string;
+    state?: string;
+  }[] = stored ? JSON.parse(stored) : [];
+  
   const exists = visitedLocations.some(
     (loc) => loc.longitude === longitude && loc.latitude === latitude
   );
+  
   if (!exists) {
-    const newEntry = {
-      longitude,
-      latitude,
-      timestamp: new Date().toISOString(),
-    };
-    visitedLocations.push(newEntry);
-    localStorage.setItem('visitedLocations', JSON.stringify(visitedLocations));
-    console.log('New location saved:', newEntry);
+    // Build the reverse geocoding URL using Mapbox's API.
+    // We request both "place" (city) and "region" (state) types.
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxAccessToken}&types=place,region`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      let city = "";
+      let state = "";
+      
+      // Iterate over the returned features to find city and state.
+      if (data.features && Array.isArray(data.features)) {
+        for (const feature of data.features) {
+          if (feature.place_type && feature.place_type.includes("place") && !city) {
+            city = feature.text;
+          }
+          if (feature.place_type && feature.place_type.includes("region") && !state) {
+            state = feature.text;
+          }
+          if (city && state) break;
+        }
+      }
+      
+      const newEntry = {
+        longitude,
+        latitude,
+        city,
+        state,
+        timestamp: new Date().toISOString(),
+      };
+      visitedLocations.push(newEntry);
+      localStorage.setItem('visitedLocations', JSON.stringify(visitedLocations));
+      console.log('New location saved:', newEntry);
+    } catch (err) {
+      console.error("Error during reverse geocoding", err);
+    }
   }
+};
+
+/**
+ * Generates the fog geometry by iteratively subtracting each square hole
+ * from a large outer polygon.
+ *
+ * Instead of unioning the holes, we subtract each square individually using Turf's difference.
+ */
+const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
+  // 1. Define an outer polygon covering the entire world.
+  // Outer ring must be in counter-clockwise (CCW) order.
+  const outerRing = [
+    [-180, 90],   // top-left
+    [180, 90],    // top-right
+    [180, -90],   // bottom-right
+    [-180, -90],  // bottom-left
+    [-180, 90]    // close ring (back to top-left)
+  ];
+  let fogGeometry: Feature<Polygon | MultiPolygon> = turf.polygon([outerRing]);
+
+  // 2. Get visited locations from localStorage
+  const stored = localStorage.getItem('visitedLocations');
+  const visitedLocations: { longitude: number; latitude: number }[] = stored
+    ? JSON.parse(stored)
+    : [];
+
+  // 3. For each visited location, create a square polygon and subtract it from the fog.
+  // Adjust offset as needed: 0.0001° latitude ~ 11m.
+  const offset = 0.0001;
+  visitedLocations.forEach((loc) => {
+    const squareCoords = [
+      [loc.longitude - offset, loc.latitude - offset], // bottom-left
+      [loc.longitude + offset, loc.latitude - offset], // bottom-right
+      [loc.longitude + offset, loc.latitude + offset], // top-right
+      [loc.longitude - offset, loc.latitude + offset], // top-left
+      [loc.longitude - offset, loc.latitude - offset]  // close the ring
+    ];
+    const square = turf.polygon([squareCoords]);
+
+    // Subtract the square from the fog geometry.
+    const diff = turf.difference(turf.featureCollection([fogGeometry, square]));
+    if (diff) {
+      fogGeometry = diff as Feature<Polygon | MultiPolygon>;
+    } else {
+      console.warn('Difference operation failed for square at', loc);
+    }
+  });
+
+  // 4. Return the final geometry as a FeatureCollection.
+  return {
+    type: 'FeatureCollection',
+    features: [fogGeometry],
+  };
+};
+
+/**
+ * Removes any existing fog layer/source and then adds the updated fog overlay
+ * using the generated geometry.
+ */
+const loadFogOverlay = (map: mapboxgl.Map) => {
+  // Remove existing fog layer and source, if they exist.
+  if (map.getLayer('fog-layer')) {
+    map.removeLayer('fog-layer');
+  }
+  if (map.getSource('fog')) {
+    map.removeSource('fog');
+  }
+
+  const fogData = generateFogGeometry();
+  map.addSource('fog', {
+    type: 'geojson',
+    data: fogData,
+  });
+  map.addLayer({
+    id: 'fog-layer',
+    type: 'fill',
+    source: 'fog',
+    paint: {
+      'fill-pattern': 'fogTexture', // You can test with 'fill-color': '#000' for plain fill.
+      'fill-opacity': 0.8,
+    },
+  });
+
+  console.log('Fog overlay loaded/refreshed using iterative difference.');
 };
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
@@ -64,11 +193,11 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const [distanceTraveled, setDistanceTraveled] = useState(0);
 
   useEffect(() => {
-    // Create the map
+    // 1. Create the map.
     const map = new mapboxgl.Map({
       container: mapContainer.current as HTMLElement,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-97.4395, 35.2226], // Set initial center to Norman, OK
+      center: [-97.4395, 35.2226], // Norman, OK
       zoom: 16,
       pitch: 40,
       bearing: 0,
@@ -78,6 +207,19 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       map.resize(); // Forces the map to adjust to its container
     });
 
+    // 2. Create and add the user marker.
+    const userMarkerEl = document.createElement('div');
+    userMarkerEl.className = 'user-marker';
+    userMarkerEl.style.width = '30px';
+    userMarkerEl.style.height = '30px';
+    userMarkerEl.style.backgroundColor = '#007cbf';
+    userMarkerEl.style.borderRadius = '50%';
+    userMarkerEl.style.border = '2px solid white';
+    userMarkerEl.style.boxShadow = '0 0 5px rgba(0,0,0,0.5)';
+    const userMarker = new mapboxgl.Marker({ element: userMarkerEl })
+      .setLngLat([-97.4395, 35.2226])
+      .addTo(map);
+/**
     // Function to get the user's current location
     const getUserLocation = () => {
       navigator.geolocation.getCurrentPosition(
@@ -247,93 +389,61 @@ if (user) {
         console.error('Error updating fog overlay:', err);
       }
     };
+**/
 
-    // When the map loads, add the fog overlay.
+    // 3. On map load, load the fog texture and fog overlay.
     map.on('load', () => {
-      // Load the fog texture image.
       map.loadImage(fogTextureImage, (imgError, image) => {
         if (imgError) {
           console.error('Error loading fog texture:', imgError);
           return;
         }
-        if (!map.hasImage('fogTexture')) {
-          map.addImage('fogTexture', image!);
+        if (image && !map.hasImage('fogTexture')) {
+          map.addImage('fogTexture', image);
         }
-        // Create the initial world-covering polygon.
-        const worldFog: FeatureCollection<Polygon> = {
-          type: 'FeatureCollection',
-          features: [
-            {
-              type: 'Feature',
-              geometry: {
-                type: 'Polygon',
-                coordinates: [
-                  [
-                    [-180, -90],
-                    [180, -90],
-                    [180, 90],
-                    [-180, 90],
-                    [-180, -90],
-                  ],
-                ],
-              },
-              properties: {},
-            },
-          ],
-        };
-        // Add the fog source and layer.
-        map.addSource('fog', {
-          type: 'geojson',
-          data: worldFog,
-        });
-        map.addLayer({
-          id: 'fog-layer',
-          type: 'fill',
-          source: 'fog',
-          paint: {
-            'fill-pattern': 'fogTexture',
-            'fill-opacity': 0.8,
-          },
-        });
-        // Update the fog overlay on load in case there are any visited locations already saved.
-        updateFogOverlay();
-        getUserLocation();
+        loadFogOverlay(map);
       });
     });
 
-    // Watch the user's position.
+    // 4. Geolocation success callback: update marker, map, save location, and reload fog.
+    const handlePositionUpdate = (position: GeolocationPosition) => {
+      const rawLon = position.coords.longitude;
+      const rawLat = position.coords.latitude;
+      const lon = roundCoordinate(rawLon);
+      const lat = roundCoordinate(rawLat);
+
+      console.log('User location:', lat, lon);
+      map.setCenter([rawLon, rawLat]);
+      userMarker.setLngLat([rawLon, rawLat]);
+
+      // Save the visited location (reverse geocoding runs in the background).
+      saveVisitedLocation(lon, lat);
+      loadFogOverlay(map);
+    };
+
+    // 5. Geolocation error callback.
+    const handlePositionError = (geoError: GeolocationPositionError) => {
+      console.error('Geolocation error:', geoError);
+      setError('Error retrieving location.');
+    };
+
+    // 6. Watch the user's position.
     let watchId: number | null = null;
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const rawLongitude = position.coords.longitude;
-          const rawLatitude = position.coords.latitude;
-          const longitude = roundCoordinate(rawLongitude);
-          const latitude = roundCoordinate(rawLatitude);
-          saveVisitedLocation(longitude, latitude);
-          updateFogOverlay();
-        },
-        (geoError) => {
-          console.error('Geolocation error:', geoError);
-          setError('Error retrieving location.');
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 1000,
-          timeout: 10000,
-        }
-      );
+      watchId = navigator.geolocation.watchPosition(handlePositionUpdate, handlePositionError, {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 10000,
+      });
     } else {
       setError('Geolocation is not supported by this browser.');
     }
 
-    // (Optional) Handle the location prop to fly to a certain location.
+    // 7. If the "location" prop is provided, fly to that location.
     const queryLocation = async (locationName: string) => {
       try {
         const response = await fetch(
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-            locationName
-          )}.json?access_token=${mapboxvar}`
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationName)}.json?access_token=${mapboxAccessToken}`
         );
         const data = await response.json();
         if (!data.features || data.features.length === 0) {
@@ -363,9 +473,10 @@ if (user) {
       queryLocation(location);
     }
 
-    // Add navigation controls.
+    // 8. Add navigation controls.
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+    // 9. Cleanup on component unmount.
     return () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
