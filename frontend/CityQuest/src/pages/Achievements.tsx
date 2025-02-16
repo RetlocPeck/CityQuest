@@ -13,6 +13,8 @@ import {
   IonCol,
   IonRouterLink,
 } from "@ionic/react";
+import Toolbar from '../components/Toolbar';
+
 import ExploreContainer from "../components/ExploreContainer";
 import star from "./star.gif";
 import shadow from "./shadow.png";
@@ -53,6 +55,7 @@ const Achievements: React.FC = () => {
           </IonCard>
           </div>
         </IonContent>
+        <Toolbar/>
       </IonPage>
       
       {loadingState ? (

@@ -38,7 +38,7 @@ const Toolbar = () => {
              className = "tool-button"
             fill = "clear"
             color = "light"
-              href = "/settings"
+              href = "/profile"
               size = "large"
             >
                 <IonIcon icon={personOutline}></IonIcon>

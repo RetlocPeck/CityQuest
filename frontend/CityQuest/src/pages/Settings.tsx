@@ -13,6 +13,7 @@ import {
     IonCardTitle,
     IonIcon,
   } from "@ionic/react";
+   
   import { useEffect, useState } from "react";
   import "../stylesheets/Settings.css";
   import { arrowBackOutline } from "ionicons/icons";
@@ -58,6 +59,7 @@ import {
             </IonCardContent>
           </IonCard>
         </IonContent>
+       
       </IonPage>
     );
   };
