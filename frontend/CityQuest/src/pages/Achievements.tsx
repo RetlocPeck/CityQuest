@@ -13,7 +13,7 @@ import {
 import Toolbar from '../components/Toolbar';
 
 import ExploreContainer from "../components/ExploreContainer";
-import pin from "./pin.png";
+import pin from "./reddpin.png";
 import star from "./star.gif";
 import "../stylesheets/Achievements.css";
 import { useEffect, useState } from "react";
