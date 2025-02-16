@@ -53,6 +53,9 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       bearing: 0,
       attributionControl: false,
     });
+    map.on("load", () => {
+      map.resize(); // Forces the map to adjust to its container
+    });
 
     // Function to get the user's current location
     const getUserLocation = () => {
