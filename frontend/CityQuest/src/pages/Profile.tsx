@@ -9,6 +9,7 @@ import {
   IonRow,
   IonTitle,
   IonToolbar,
+  IonText,
 } from "@ionic/react";
 import ".././stylesheets/Profile.css";
 import { useEffect, useState } from "react";
@@ -18,39 +19,50 @@ import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
 import star from "./pin.png";
+import { onAuthStateChanged } from "@firebase/auth";
 const Profile: React.FC = () => {
   const [error, setError] = useState(""); //Stores the error message if there is one
   const [name, setName] = useState<string>(""); // Stores the user's name
   const [email, setEmail] = useState<string>(""); // Stores the user's email
   const [visitationStatuses, setVisitationStatuses] = useState([]);
+  const [loading, setLoading] = useState<boolean>(true); // Tracks loading state
+
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const user = auth.currentUser; // Get the currently authenticated user
-        if (user) {
-          // Fetch user data from Firestore
-          const userDocRef = doc(firestore, "users", user.uid); // Reference to the user's document in Firestore
-          const userDocSnap = await getDoc(userDocRef); // Get the document snapshot
-          
-          if (userDocSnap.exists()) {
-            // If document exists, extract the name and email
-            const userData = userDocSnap.data();
-            setName(userData.displayName || "No name found");
-            setEmail(userData.email || "No email found");
-          } else {
-            setError("User data not found.");
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        setError("Error loading user profile");
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // If the user is authenticated, fetch the user profile data
+        fetchUserProfile(user.uid);
+      } else {
+        // If the user is not authenticated, handle it accordingly
+        setError("User not authenticated.");
+        setLoading(false); // Stop loading when user is not authenticated
       }
-    };
-    fetchUserProfile();
+    });
+
+    // Cleanup the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const userDocRef = doc(firestore, "users", userId); // Get the user's document reference from Firestore
+      const userDocSnap = await getDoc(userDocRef); // Fetch the document snapshot
 
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setName(userData.displayName || "No name found"); // Set the name from the document data
+        setEmail(userData.email || "No email found"); // Set the email from the document data
+      } else {
+        setError("User data not found.");
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Error loading user profile.");
+    } finally {
+      setLoading(false); // Stop loading once the data is fetched
+    }
+  };
   return (
     <IonPage>
       <IonContent fullscreen className="profile-bg">
@@ -74,7 +86,7 @@ const Profile: React.FC = () => {
             <IonIcon icon={settingsOutline}></IonIcon>
           </IonButton>
         </IonToolbar>
-
+       
         <div className="profile">
           <IonCard className="card1">
             <img
@@ -83,10 +95,14 @@ const Profile: React.FC = () => {
               alt="Star"
               style={{ width: "80px" }}
             />
+             {loading ? (
+          <IonText className="username">Loading...</IonText> 
+        ) : (
             <div className="labels">
               <div className="username">Name: {name}</div>
               <div className="username">Email: {email}</div>
             </div>
+                )}
           </IonCard>
           <IonCard className="card2">
             {visitationStatuses.map((status, index) => (
@@ -98,7 +114,7 @@ const Profile: React.FC = () => {
             ))}
           </IonCard>
         </div>
-     
+ 
         <Toolbar />
       </IonContent>
       
@@ -107,11 +123,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-function setEmail(arg0: any) {
-    throw new Error("Function not implemented.");
-}
-
-function setName(arg0: any) {
-    throw new Error("Function not implemented.");
-}
-
