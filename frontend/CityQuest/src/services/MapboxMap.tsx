@@ -1,112 +1,124 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+// Import the image so the bundler handles its URL correctly
+import fogTextureImage from '../images/fogTexture.png';
 
-//Access token for Mapbox API
 const mapboxvar = "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
 mapboxgl.accessToken = mapboxvar;
 
 interface MapboxMapProps {
-  location: string | [number, number]; // Can be a location name (string) or coordinates (latitude, longitude)
+  location: string | [number, number];
 }
 
-// MapboxMap component that displays a map using Mapbox GL JS
-
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
-  const mapContainer = useRef<HTMLDivElement | null>(null); // Reference to the div that will contain the map
-  const [error, setError] = useState<string | null>(null); // Error message state
+  const mapContainer = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     const map = new mapboxgl.Map({
-      container: mapContainer.current as HTMLElement, // The DOM element to contain the map
-      style: 'mapbox://styles/mapbox/streets-v11', // You can switch to a 2D style (e.g., 'streets-v11')
-      center: [-74.5, 40], // Default starting position [longitude, latitude]
-      zoom: 16, // Starting zoom level
-      pitch: 0, // Set pitch to 0 for 2D view
-      bearing: 0, // Map rotation to 0 (no rotation)
-      attributionControl: false, // Disable Mapbox attribution control
+      container: mapContainer.current as HTMLElement,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [-74.5, 40],
+      zoom: 16,
+      pitch: 0,
+      bearing: 0,
+      attributionControl: false,
     });
 
+    map.on('load', () => {
+      // Use the imported image URL instead of a relative path
+      map.loadImage(fogTextureImage, (error, image) => {
+        if (error) {
+          console.error('Error loading fog texture:', error);
+          return;
+        }
 
-    // Function to query the location by name (geocoding)
-    const queryLocation = async (locationName: string) => {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationName)}.json?access_token=${mapboxvar}`
-      );
-      const data = await response.json();
+        // Add the image if it hasn't been added already
+        if (!map.hasImage('fogTexture')) {
+          map.addImage('fogTexture', image!);
+        }
 
+        // Create a world-covering polygon
+        const worldFog: GeoJSON.FeatureCollection = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates: [
+                  [
+                    [-180, -90],
+                    [180, -90],
+                    [180, 90],
+                    [-180, 90],
+                    [-180, -90],
+                  ],
+                ],
+              },
+              properties: {},
+            },
+          ],
+        };
 
-      if (!data.features || data.features.length === 0) {
-        // If no results were found
-        setError('Location not found.');
-        return;
-      }
-      const [longitude, latitude] = data.features[0].center; // Get the coordinates from the first result
+        // Add a GeoJSON source with the polygon
+        map.addSource('fog', {
+          type: 'geojson',
+          data: worldFog,
+        });
 
-
-      // Move the map to the queried location with 2D view
-      map.flyTo({
-        center: [longitude, latitude],
-        zoom: 18, // Set zoom level to an appropriate value
-        pitch: 40, // No tilt for 2D view
-        speed: 0.8, // Smooth flying animation
-        curve: 1, // Flight curve for smooth transition
+        // Add a fill layer using the fog texture
+        map.addLayer({
+          id: 'fog-layer',
+          type: 'fill',
+          source: 'fog',
+          paint: {
+            'fill-pattern': 'fogTexture', // Pattern from the image added above
+            'fill-opacity': 0.8,
+          },
+        });
       });
-    };
+    });
 
-    // Add geolocation control to the map
-    map.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true, // Keeps tracking user's position
-        showUserHeading: true    // Shows the user's orientation
-      })
-    );
-
-
-    // Get the user's location using the browser's geolocation
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-    
-        console.log("User Location:", latitude, longitude);
-    
-        // Move the Mapbox map to the user's location
+    // Handle the location prop (either geocoding a name or using coordinates)
+    const queryLocation = async (locationName: string) => {
+      try {
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+            locationName
+          )}.json?access_token=${mapboxvar}`
+        );
+        const data = await response.json();
+        const [longitude, latitude] = data.features[0].center;
         map.flyTo({
           center: [longitude, latitude],
-          zoom: 15
+          zoom: 18,
+          pitch: 40,
+          speed: 0.8,
+          curve: 1,
         });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-      },
-      { enableHighAccuracy: true } // Use high accuracy if available
-    );
-    
+      } catch (err) {
+        console.error('Error fetching location:', err);
+      }
+    };
 
-    // Handle the location prop
     if (Array.isArray(location)) {
-      // If location is an array of [longitude, latitude], use it directly
       map.flyTo({
         center: location,
         zoom: 16,
         pitch: 0,
       });
     } else if (typeof location === 'string') {
-      // If location is a string (place name), query it
       queryLocation(location);
     }
 
-    
-    // Optional: Add navigation controls for zoom and rotation
+    // Optional: Add navigation controls
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-    // Cleanup the map instance when the component is unmounted
-    return () => map.remove();
-  }, [location]); // Rerun the effect if the location changes
+    return () => {
+      map.remove();
+    };
+  }, [location]);
 
-  return (
-    <div
-      ref={mapContainer}
-      style={{ width: '100%', height: '500px' }} // Adjust the size as needed
-    />
-  );
+  return <div ref={mapContainer} style={{ width: '100%', height: '500px' }} />;
 };
