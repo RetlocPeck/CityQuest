@@ -15,6 +15,9 @@ import {
   import ExploreContainer from "../components/ExploreContainer";
   import { useEffect, useState } from "react";
   import "../stylesheets/SignUp.css";
+  import { getFirestore, doc, setDoc } from "firebase/firestore";
+  import { signUp } from '../services/authService';
+  import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
   import star from "./star.gif";
   const SignUp: React.FC = () => {
@@ -29,6 +32,28 @@ import {
       email: "",
       city: "",
     });
+
+    const handleSignup = async () => {
+        var user;
+        try {
+          const userCredential = await signUp(formData.email, formData.password);
+          console.log("Signed up successfully!", userCredential.user);
+          user = userCredential.user;
+          // Save additional user data to Firestore
+          await setDoc(doc(firestore, "users", user.uid), {
+            email: user.email,
+            createdAt: new Date(),
+            displayName: formData.firstName + " " + formData.lastSecond,
+            pinnedCities: [formData.city],
+          });
+          //setDoc()
+        } catch (error) {
+          console.error("Signup error:", error);
+          // Optionally, show an error message to the user
+        }
+
+        
+      };
   
     const sendUserData = async () => {
       const response = await fetch("url/signup", {
@@ -116,7 +141,7 @@ import {
                 <IonButton
                   className="signup-hover-solid wide"
                   fill="clear"
-                  onClick={sendUserData}
+                  onClick={handleSignup}
                 >
                   Submit
                 </IonButton>
