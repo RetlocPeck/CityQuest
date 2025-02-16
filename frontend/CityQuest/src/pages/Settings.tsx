@@ -12,6 +12,7 @@ import {
     IonCol,
     IonCardTitle,
   } from "@ionic/react";
+   
   import { useEffect, useState } from "react";
   import "../stylesheets/Settings.css";
   
@@ -50,6 +51,7 @@ import {
             </IonCardContent>
           </IonCard>
         </IonContent>
+       
       </IonPage>
     );
   };
