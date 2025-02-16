@@ -8,15 +8,18 @@ import {
   IonRow,
   IonToolbar,
   IonText,
+  IonInput,
+  IonProgressBar,
 } from "@ionic/react";
 import "../stylesheets/Profile.css";
 import { useEffect, useState } from "react";
-import { arrowBackOutline, settingsOutline } from "ionicons/icons";
+import { arrowBackOutline, checkmarkOutline, settingsOutline } from "ionicons/icons";
 import Toolbar from "../components/Toolbar";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "../firebase-config";
 import { onAuthStateChanged } from "@firebase/auth";
 import * as turf from "@turf/turf";
+import star from "../assets/pin.png"
 
 // --- Helper: Fetch City Area using Overpass API (summing areas of all returned elements) ---
 const fetchCityAreaOverpass = async (pinnedCity: string): Promise<number> => {
@@ -100,6 +103,9 @@ const Profile: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [visitationStatuses, setVisitationStatuses] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showInput, setShowInput] = useState<boolean>(false); // Controls the visibility of the city input
+  const [newCityName, setNewCityName] = useState<string>(""); // Stores new city name
+
 
   // New states for pinned cities and city statistics
   const [pinnedCities, setPinnedCities] = useState<string[]>([]);
@@ -118,6 +124,36 @@ const Profile: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  const addCity = async () => {
+    if (!newCityName) {
+      setError("Please enter a city name.");
+      return;
+    }
+  
+    const userId = auth.currentUser?.uid;
+    if (!userId) {
+      setError("User not authenticated.");
+      return;
+    }
+  
+    try {
+      const userDocRef = doc(firestore, "users", userId);
+      await setDoc(
+        userDocRef,
+        {
+          pinnedCities: [...pinnedCities, newCityName], // Add new city to the array
+        },
+        { merge: true } // Merge with existing data, so other fields aren't overwritten
+      );
+  
+      setPinnedCities((prev) => [...prev, newCityName]);
+      setNewCityName(""); // Clear input after adding city
+      setShowInput(false); // Hide the input field
+    } catch (e) {
+      console.error(e);
+      setError("Error adding city.");
+    }
+  };
   // Fetch user profile from Firestore.
   // Assumes the document contains displayName, email, and pinnedCities.
   const fetchUserProfile = async (userId: string) => {
@@ -221,6 +257,8 @@ const Profile: React.FC = () => {
 
         <div className="profile">
           <IonCard className="card1">
+          <img className="profpic" src={star} alt="Star" style={{ width: "80px" }} />
+
 
             {loading ? (
               <IonText className="username">Loading...</IonText>
@@ -231,43 +269,45 @@ const Profile: React.FC = () => {
               </div>
             )}
           </IonCard>
-          <IonCard className="card2">
-            {visitationStatuses.map((status, index) => (
-              <IonRow key={index}>
-                <IonCol size="12">
-                  <p>{status}</p>
-                </IonCol>
-              </IonRow>
-            ))}
-          </IonCard>
+          
 
-          {/* New Card: Display City Exploration Statistics */}
-          {cityStats.length > 0 && (
-            <IonCard className="card3">
-              <IonRow>
-                <IonCol>
-                  <strong>City</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Unlocked Area (m²)</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Total Area (m²)</strong>
-                </IonCol>
-                <IonCol>
-                  <strong>Explored (%)</strong>
-                </IonCol>
-              </IonRow>
-              {cityStats.map((stat, idx) => (
-                <IonRow key={idx}>
-                  <IonCol>{stat.city}</IonCol>
-                  <IonCol>{stat.unlockedArea.toFixed(1)}</IonCol>
-                  <IonCol>{stat.totalArea.toFixed(1)}</IonCol>
-                  <IonCol>{stat.percentage.toFixed(2)}%</IonCol>
-                </IonRow>
-              ))}
+          
+          
+
+
+          <IonCard className="card2">
+            {cityStats.map((stat, idx) => (
+  <IonRow key={idx}>
+    <IonCol size="12">
+        <div className="progress">
+          <p className = "cityname">{stat.city} </p>
+          <IonProgressBar className="bars" value={parseFloat(stat.percentage.toFixed(2))} />
+      <p >{stat.percentage.toFixed(2)}% explored</p>
+      </div>
+    </IonCol>
+  </IonRow>
+))}
+
+  
+              {showInput ? (
+                <div>
+                  <IonInput
+                    value={newCityName}
+                    onIonChange={(e) => setNewCityName(e.detail.value!)}
+                    placeholder="City name"
+                  />
+                <IonIcon icon={checkmarkOutline} color="dark"onClick={() => {
+                  addCity(); 
+                  setShowInput(false); 
+                }}></IonIcon>
+                </div>
+              ) : (
+                <IonButton className="profile-hover-solid" fill="clear" onClick={() => setShowInput(true)}>
+                  Add City
+                </IonButton>
+              )}
             </IonCard>
-          )}
+         
         </div>
         <Toolbar />
       </IonContent>
@@ -276,6 +316,9 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
+
+
+
 /** 
     IonButton,
     IonIcon,

@@ -42,7 +42,7 @@
     flex-direction: column;
     display: flex;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
     text-align: center;
     padding: 16px;
     border-radius: 16px;
@@ -80,7 +80,7 @@
     width: 88%;  
     font-family: 'Lato', sans-serif;
     font-size: 1.2em;
-    margin-top: 10px;
+    margin-top: 30px;
     text-transform:none;
     max-width: 35%;
     text-align: center;
@@ -107,4 +107,11 @@
 
 .bars{
     width: 350px;
+}
+
+.llp{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }

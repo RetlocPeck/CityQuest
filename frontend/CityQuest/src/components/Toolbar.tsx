@@ -43,7 +43,7 @@ const Toolbar = () => {
             >
                 <IonIcon icon={personOutline}></IonIcon>
             </IonButton>
-
+{/** 
             <IonButton
              className = "tool-button"
             fill = "clear"
@@ -53,6 +53,7 @@ const Toolbar = () => {
             >
                 <IonIcon icon={bookOutline}></IonIcon>
             </IonButton>
+    */}
             </div>
 
         </IonToolbar>

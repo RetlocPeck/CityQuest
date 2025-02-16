@@ -3,7 +3,7 @@
 .a-initial-bg {
     --background: url('../assets/bg2.jpeg') no-repeat center center / cover;
 
-    overflow: hidden;
+    
     padding: auto;
     margin: auto; 
 
@@ -51,7 +51,9 @@
     padding: 16px;
     border-radius: 16px;
     height: 71%;
+    overflow-y: auto;
 }
+
 
 .a-card-title{
 
