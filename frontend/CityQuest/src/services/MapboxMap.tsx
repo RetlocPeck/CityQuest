@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as turf from '@turf/turf'; // For creating circle polygons
 // Import the image so the bundler handles its URL correctly
 import fogTextureImage from '../images/fogTexture.png';
 import pin from '../pages/jump-pin-unscreen.gif';
+import arrow from '../pages/arrow.png';
 import type { FeatureCollection, Feature, Polygon } from 'geojson';
 
 const mapboxvar =
@@ -40,8 +41,9 @@ const saveVisitedLocation = (longitude: number, latitude: number) => {
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<{ marker: mapboxgl.Marker; lng: number; lat: number }[]>([]);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     // Create the map
@@ -69,6 +71,21 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
             pitch: 40,
             bearing: 0,
           });
+
+          // Create or update the user marker
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            const userMarkerElement = document.createElement('div');
+            userMarkerElement.style.width = '50px';
+            userMarkerElement.style.height = '50px';
+            userMarkerElement.style.backgroundImage = `url(${arrow})`;
+            userMarkerElement.style.backgroundSize = 'cover';
+
+            userMarkerRef.current = new mapboxgl.Marker(userMarkerElement)
+              .setLngLat([longitude, latitude])
+              .addTo(map);
+          }
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -206,6 +223,11 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
           const latitude = roundCoordinate(rawLatitude);
           saveVisitedLocation(longitude, latitude);
           updateFogOverlay();
+
+          // Update the user marker position
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          }
         },
         (geoError) => {
           console.error('Geolocation error:', geoError);
