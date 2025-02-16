@@ -21,7 +21,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       style: 'mapbox://styles/mapbox/streets-v11',
       center: [-74.5, 40],
       zoom: 16,
-      pitch: 0,
+      pitch: 40,
       bearing: 0,
       attributionControl: false,
     });
@@ -93,7 +93,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
           map.flyTo({
             center: [longitude, latitude],
             zoom: 16,
-            pitch: 0,
+            pitch: 40,
             bearing: 0,
           });
         },
@@ -142,7 +142,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       map.flyTo({
         center: location,
         zoom: 16,
-        pitch: 0,
+        pitch: 40,
       });
     } else if (typeof location === 'string') {
       queryLocation(location);
