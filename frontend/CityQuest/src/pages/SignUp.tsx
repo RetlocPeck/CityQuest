@@ -12,6 +12,7 @@ import {
   IonRow,
   IonCol,
   IonCardTitle,
+  IonText,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import ExploreContainer from "../components/ExploreContainer";
@@ -28,14 +29,15 @@ import star from "./sparkles.gif";
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastSecond: "",
+    name: "",
     password: "",
     email: "",
     city: "",
   });
 
 const history = useHistory();
+const [errorMessage, setErrorMessage] = useState<string>(""); 
+
 const goToHome = () => {
   history.push("/home");
 };
@@ -50,16 +52,20 @@ const goToHome = () => {
         console.log("Signed up successfully!", userCredential.user);
         user = userCredential.user;
         // Save additional user data to Firestore
+        goToHome();
+
         await setDoc(doc(firestore, "users", user.uid), {
           email: user.email,
           createdAt: new Date(),
-          displayName: formData.firstName + " " + formData.lastSecond,
+          displayName: formData.name,
           pinnedCities: [formData.city],
           distanceTraveled: 0,
         });
         goToHome();
       } catch (error) {
         console.error("Signup error:", error);
+        setErrorMessage("Signup failed. Please try again later."); // Set the error message
+
         // Optionally, show an error message to the user
       }
 
@@ -77,6 +83,7 @@ const goToHome = () => {
 
     if (response.ok) {
       console.log("signup successful");
+      
     } else {
       console.log("signup failed");
     }
@@ -107,9 +114,9 @@ const goToHome = () => {
                 <input className="signup-textboxes"
                 placeholder="Name"
                   type="text"
-                  value={formData.firstName}
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
+                    setFormData({ ...formData, name: e.target.value })
                   }
                 />
       
@@ -160,7 +167,13 @@ const goToHome = () => {
               >
                 Submit
               </IonButton>
+              {errorMessage && (
+            <IonText color="danger" className="signup-error-message">
+              <p>{errorMessage}</p>
+            </IonText>
+          )}
               </IonCard>
+             
               </div>
       </IonContent>
     </IonPage>
@@ -168,3 +181,7 @@ const goToHome = () => {
 };
 
 export default SignUp;
+function setErrorMessage(arg0: string) {
+    throw new Error("Function not implemented.");
+}
+
