@@ -11,18 +11,22 @@ import {
   IonCard,
 } from "@ionic/react";
 import Toolbar from '../components/Toolbar';
-
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { app, analytics, auth, firestore, storage } from '../firebase-config';
+import { getAuth } from 'firebase/auth';
+import { onAuthStateChanged } from "@firebase/auth";
 import ExploreContainer from "../components/ExploreContainer";
 import pin from "./reddpin.png";
 import star from "./star.gif";
 import "../stylesheets/Achievements.css";
 import { useEffect, useState } from "react";
+import { circle } from "@turf/turf";
+
 
 const Achievements: React.FC = () => {
   const [achievements, setAchievements] = useState([]); // Stores the achievements
   const [loadingState, setLoadingState] = useState(true); // Stores the current loading state
   const [error, setError] = useState(""); // Stores the error message if there is one
-
   const [completedAchievements, setCompletedAchievements] = useState(
     new Set<number>() // Set to track completed achievements
   );
@@ -33,32 +37,36 @@ const Achievements: React.FC = () => {
     const sampleAchievements = [
       {
         id: 0,
-        title: "First Achievement",
-        description: "Complete your first task.",
+        title: "Beginner Adventurer",
+        description: "A badge for a fledgeling adventurer. Travel 10 meters.",
+        criteria: 10,
         imageUrl: pin,
       },
       {
         id: 1,
-        title: "Level Up",
-        description: "Reach level 10.",
+        title: "Novice Adventurer",
+        description: "A badge for those with some interest in exploring. Travel 100 meters.",
+        criteria: 100,
         imageUrl: pin,
       },
       {
         id: 2,
-        title: "Explorer",
-        description: "Explore 100 locations.",
+        title: "Apprentice Adventurer",
+        description: "A badge for adventurers well versed in their surroundings. Travel 3 kilometers.",
+        criteria: 3000,
         imageUrl: pin,
       },
       {
         id: 3,
-        title: "Social Butterfly",
-        description: "Make 50 new friends.",
+        title: "Master Adventurer",
+        description: "A title fit for only the most active of adventurers. Travel 50 kilometers.",
+        criteria: 50000,
         imageUrl: pin,
       },
       {
         id: 4,
-        title: "Master Coder",
-        description: "Complete 100 coding challenges.",
+        title: "Getting the Hang of It",
+        description: "Level up for the first time.",
         imageUrl: pin,
       },
       {
@@ -69,9 +77,50 @@ const Achievements: React.FC = () => {
       },
     ];
   
-    const handleCompletion = (id: number) => {
-      setCompletedAchievements((prev) => new Set(prev).add(id));
-    };
+    useEffect(() => {
+      const fetchUserDistance = async (user: any) => {
+        try {
+          const db = getFirestore();
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const distanceTravelled = userData.distanceTravelled || 0;
+            console.log("Distance travelled:", distanceTravelled);
+  
+            // Determine completed achievements
+            const completed = new Set<number>();
+            sampleAchievements.forEach((achievement) => {
+              if (distanceTravelled >= achievement.criteria) {
+                completed.add(achievement.id);
+              }
+            });
+  
+            setCompletedAchievements(completed);
+          } else {
+            setError("User data not found.");
+          }
+        } catch (err) {
+          setError("Error fetching user data.");
+          console.error(err);
+        } finally {
+          setLoadingState(false);
+        }
+      };
+  
+      const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
+        if (user) {
+          console.log("User authenticated:", user.email);
+          fetchUserDistance(user);
+        } else {
+          setError("User not authenticated.");
+          setLoadingState(false);
+        }
+      });
+  
+      // Cleanup the listener when the component unmounts
+      return () => unsubscribe();
+    }, []);
 
   return (
     <>
