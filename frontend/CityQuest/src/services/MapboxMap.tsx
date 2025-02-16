@@ -47,7 +47,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     const map = new mapboxgl.Map({
       container: mapContainer.current as HTMLElement,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [-74.5, 40],
+      center: [-97.4395, 35.2226], // Set initial center to Norman, OK
       zoom: 16,
       pitch: 0,
       bearing: 0,
