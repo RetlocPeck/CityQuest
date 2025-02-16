@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 //Access token for Mapbox API
@@ -13,8 +13,7 @@ interface MapboxMapProps {
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null); // Reference to the div that will contain the map
-
-
+  const [error, setError] = useState<string | null>(null); // Error message state
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainer.current as HTMLElement, // The DOM element to contain the map
@@ -33,6 +32,13 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(locationName)}.json?access_token=${mapboxvar}`
       );
       const data = await response.json();
+
+
+      if (!data.features || data.features.length === 0) {
+        // If no results were found
+        setError('Location not found.');
+        return;
+      }
       const [longitude, latitude] = data.features[0].center; // Get the coordinates from the first result
 
 
