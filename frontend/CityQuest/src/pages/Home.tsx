@@ -54,6 +54,7 @@ const Home: React.FC = () => {
         value={searchQuery}
         onIonInput={handleSearchChange}
         className="searchbar"
+        
       />
       {suggestions.length > 0 && (
         <IonList className="suggestions-list">

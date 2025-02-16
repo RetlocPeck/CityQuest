@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 .settings-bg {
-    --background: url('../pages/bg2.jpeg') no-repeat center center / cover;
+    --background: url('../assets/bg2.jpeg') no-repeat center center / cover;
     overflow: hidden;
     padding: auto;
     margin: auto; 

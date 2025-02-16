@@ -1,38 +1,53 @@
+/* Ensure the main container is full-screen */
 .home-container {
-  position: relative;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Ensure the map container is full-screen */
+  .map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Behind other elements */
+  }
+  
+  /* Overlay elements */
+  .searchbar {
+    
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    z-index: 2; /* Above map */
+  }
 
-.map-container {
-  position:absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height:80vh;
-  z-index: -1; /* Ensures the map is behind everything */
-}
-
-.searchbar {
-  position: relative;
-  z-index: 10;
-  margin-top: 10px;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.suggestions-list {
-  position: relative;
-  z-index: 10;
-  background: white;
-}
-
-.toolbar {
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 10;
-}
+  .searchbar-input.sc-ion-searchbar-md{
+    border-radius: 20px;
+  }
+  
+  .suggestions-list {
+    position: absolute;
+    top: 80px; /* Below search bar */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    z-index: 2;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Toolbar */
+  .toolbar {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 8px;
+    width: 100%;
+    z-index: 2;
+  }
+  

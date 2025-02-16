@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { login } from '../services/authService'; // Import login function
 import { useHistory } from "react-router-dom";
 import "../stylesheets/Initial.css";
-import star from "./pin.png";
+import star from "../assets/pin.png";
 
 const Initial: React.FC = () => {
   const history = useHistory(); // For navigation
