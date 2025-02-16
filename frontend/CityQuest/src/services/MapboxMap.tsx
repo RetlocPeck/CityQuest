@@ -13,6 +13,7 @@ interface MapboxMapProps {
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -89,6 +90,13 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
           )}.json?access_token=${mapboxvar}`
         );
         const data = await response.json();
+
+
+        if (!data.features || data.features.length === 0) {
+          // If no results were found
+          setError('Location not found.');
+          return;
+        }
         const [longitude, latitude] = data.features[0].center;
         map.flyTo({
           center: [longitude, latitude],
