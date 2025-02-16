@@ -19,7 +19,7 @@ const Home: React.FC = () => {
        * - Acccount, Achievments
        */}
        
-        <MapboxMap/>
+        <MapboxMap location={"Oklahoma"}/>
       </IonContent>
       <Toolbar />
     </IonPage>
