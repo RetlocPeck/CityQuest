@@ -3,13 +3,13 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import * as turf from '@turf/turf'; // For creating circle polygons
-import { getFirestore, doc, updateDoc, getDoc} from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 // Import the image so the bundler handles its URL correctly
 
 import fogTextureImage from '../images/fogTexture.png';
 
-import type { Feature, FeatureCollection, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
+import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson';
 
 // Mapbox access token
 const mapboxAccessToken =
@@ -234,17 +234,75 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     });
 
     // 4. Geolocation success callback: update marker, map, save location, and reload fog.
-    const handlePositionUpdate = (position: GeolocationPosition) => {
+    const handlePositionUpdate = async (position: GeolocationPosition) => {
       const rawLon = position.coords.longitude;
       const rawLat = position.coords.latitude;
       const lon = roundCoordinate(rawLon);
       const lat = roundCoordinate(rawLat);
-
+    
       console.log('User location:', lat, lon);
       map.setCenter([rawLon, rawLat]);
       userMarker.setLngLat([rawLon, rawLat]);
-
-      // Save the visited location (reverse geocoding runs in the background).
+    
+      // Calculate distance if previous coordinates are available
+      if (previousLatitude.current !== null && previousLongitude.current !== null) {
+        console.log('Previous location:', previousLatitude.current, previousLongitude.current);
+        const distance = calculateDistance(
+          previousLatitude.current,
+          previousLongitude.current,
+          rawLat,
+          rawLon
+        );
+        console.log('Distance traveled:', distance);
+    
+        // Update the distanceTravelled field in Firebase
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+        if (user) {
+          const db = getFirestore();
+          const userDocRef = doc(db, 'users', user.uid);
+        
+          try {
+            // Get the document data
+            const userData = await getDoc(userDocRef);
+        
+            if (userData.exists()) {
+              // Retrieve the current distanceTravelled
+              const currentDistance = userData.data().distanceTravelled || 0;
+        
+              // Update the distance in the Firestore document
+              const newDistance = currentDistance + distance;
+              setDistanceTraveled(newDistance);
+              await updateDoc(userDocRef, {
+                distanceTravelled: newDistance,  // Add the new distance
+              });
+        
+              console.log('Distance updated in Firestore:', newDistance);
+            } else {
+              console.warn('User document does not exist.');
+            }
+          } catch (error) {
+            console.error('Error updating distance in Firestore:', error);
+          }
+        } else {
+          console.warn('No authenticated user found.');
+        }
+      }
+    
+      // Update previous coordinates
+      previousLatitude.current = rawLat;
+      previousLongitude.current = rawLon;
+    
+      // Move the map to the new location
+      map.flyTo({
+        center: [lon, lat],
+        zoom: 16,
+        pitch: 40,
+        bearing: 0,
+      });
+    
+      // Save the visited location
       saveVisitedLocation(lon, lat);
       loadFogOverlay(map);
     };
