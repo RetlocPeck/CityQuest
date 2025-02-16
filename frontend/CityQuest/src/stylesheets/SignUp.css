@@ -22,7 +22,7 @@ html,body {
 }
 
 .signup-card1 {
-    height: 35%;
+    height: 40%;
     width: 80%;
     flex-direction: column;
     display: flex;
@@ -60,7 +60,7 @@ html,body {
 
 
 .signup-textboxes{
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     border: 1px solid gray;
     border-radius: 2px;
    background-color: rgb(213, 212, 212);
@@ -86,6 +86,9 @@ html,body {
     align-items: center;
     justify-content: center;
     margin-bottom: 2px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    text-align: center;
+    font-size: 1.1em;
 }
 .signup-hover-solid {
     color: white; 
@@ -95,7 +98,7 @@ html,body {
     margin-left: 10px;
     margin-right: 10px;
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    font-size: 1em;
+    font-size: 1.2em;
 }
 
 .signup-hover-solid.wide {

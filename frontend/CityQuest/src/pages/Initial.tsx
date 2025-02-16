@@ -59,8 +59,7 @@ const Initial: React.FC = () => {
       <IonContent fullscreen className="initial-bg">
 
         <div className="center-con">
-        <img src= {star} alt="Star animation" style = {{width: "200px"}} />
-
+        <img src= {star} alt="Star animation" style = {{width: "150px"}} />
           {/*TOP CARD*/}
           <IonCard className="card1">
             {/*CITY QUEST LABEL*/}
@@ -78,6 +77,7 @@ const Initial: React.FC = () => {
               <IonItem>
                   {/* <IonLabel position="floating">Email</IonLabel> */}
                   <IonInput
+                  className = "input"
                     type="text"
                     value={email}
                     placeholder="Username"
@@ -88,6 +88,7 @@ const Initial: React.FC = () => {
                 <IonItem>
                   {/* <IonLabel position="floating">Password</IonLabel> */}
                   <IonInput
+                   className = "input"
                     type="password"
                     value={password}
                     placeholder="Password"

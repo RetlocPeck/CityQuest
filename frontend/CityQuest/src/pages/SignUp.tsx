@@ -75,7 +75,7 @@ const SignUp: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="signup-bg">
       <div className="signup-center-con">
-      <img src= {star} alt="Star animation" style = {{width: "200px"}} />
+      <img src= {star} alt="Star animation" style = {{width: "150px"}} />
 
         <IonCard className="signup-card1">
           <IonCardHeader>
@@ -123,7 +123,7 @@ const SignUp: React.FC = () => {
               </IonCard>
               <IonCard className="signup-card2">
               <IonCardHeader className = "signup-citybox">
-                  Enter your current city below
+                  Enter your current city below:
               </IonCardHeader>
                   <IonCardContent className="signup-topalign">
                   <div className="signup-buttons">
