@@ -1,7 +1,47 @@
-.home-bg{
-    height: 100vh;
+/* Ensure full-screen map */
+.home-container {
+    
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+.extra{
+    height: 90%;
+}
+/* Map as a background */
+.map-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Behind the overlay */
 }
 
-.home-center-con {
-    height: 83%;
+/* Overlay for search and suggestions */
+.overlay {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  z-index: 2; /* Above the map */
+  
+  padding: 8px;
+  border-radius: 12px;
+}
+
+/* Styled search bar */
+.searchbar {
+  --border-radius: 20px;
+  --height: 60px;
+  width: 100%;
+}
+
+/* Style suggestions list */
+.suggestions-list {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
 }
