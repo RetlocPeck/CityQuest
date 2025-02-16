@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 
+//Access token for Mapbox API
 const mapboxvar = "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
 mapboxgl.accessToken = mapboxvar;
 
@@ -8,8 +9,11 @@ interface MapboxMapProps {
   location: string | [number, number]; // Can be a location name (string) or coordinates (latitude, longitude)
 }
 
+// MapboxMap component that displays a map using Mapbox GL JS
+
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null); // Reference to the div that will contain the map
+
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -22,6 +26,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       attributionControl: false, // Disable Mapbox attribution control
     });
 
+
     // Function to query the location by name (geocoding)
     const queryLocation = async (locationName: string) => {
       const response = await fetch(
@@ -29,6 +34,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       );
       const data = await response.json();
       const [longitude, latitude] = data.features[0].center; // Get the coordinates from the first result
+
 
       // Move the map to the queried location with 2D view
       map.flyTo({
@@ -39,6 +45,36 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         curve: 1, // Flight curve for smooth transition
       });
     };
+
+    // Add geolocation control to the map
+    map.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true, // Keeps tracking user's position
+        showUserHeading: true    // Shows the user's orientation
+      })
+    );
+
+
+    // Get the user's location using the browser's geolocation
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+    
+        console.log("User Location:", latitude, longitude);
+    
+        // Move the Mapbox map to the user's location
+        map.flyTo({
+          center: [longitude, latitude],
+          zoom: 15
+        });
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+      },
+      { enableHighAccuracy: true } // Use high accuracy if available
+    );
+    
 
     // Handle the location prop
     if (Array.isArray(location)) {
