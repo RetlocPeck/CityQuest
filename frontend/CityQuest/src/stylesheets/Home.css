@@ -29,6 +29,11 @@
   .searchbar-input.sc-ion-searchbar-md{
     border-radius: 20px;
   }
+
+  .mapboxgl-map {
+    height: 894px !important;
+    width: 415 !important;
+}
   
   .suggestions-list {
     position: absolute;
@@ -46,7 +51,7 @@
   .toolbar {
     position: absolute;
     bottom: 0;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     width: 100%;
     z-index: 2;
   }
