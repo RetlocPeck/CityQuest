@@ -43,37 +43,35 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="home-container">
-        <div className="extra"> 
-        {/* Map as background */}
-        <div className="map-background">
-          <MapboxMap location={selectedLocation} />
-x
-
-        {/* Search and suggestions on top */}
-        <div className="overlay">
-          <IonSearchbar
-            value={searchQuery}
-            onIonInput={handleSearchChange}
-            className="searchbar"
-          />
-          {suggestions.length > 0 && (
-            <IonList className="suggestions-list">
-              {suggestions.map((feature: any) => (
-                <IonItem button key={feature.id} onClick={() => handleSuggestionClick(feature)}>
-                  {feature.place_name}
-                </IonItem>
-              ))}
-            </IonList>
-          )}
-        </div>
-        </div>
-        </div>
+    <IonContent fullscreen className="home-container">
+      {/* Map as background */}
+      <div className="map-container">
+        <MapboxMap location={selectedLocation} />
+      </div>
+  
+      {/* Search and suggestions on top */}
+      <IonSearchbar
+        value={searchQuery}
+        onIonInput={handleSearchChange}
+        className="searchbar"
+      />
+      {suggestions.length > 0 && (
+        <IonList className="suggestions-list">
+          {suggestions.map((feature: any) => (
+            <IonItem button key={feature.id} onClick={() => handleSuggestionClick(feature)}>
+              {feature.place_name}
+            </IonItem>
+          ))}
+        </IonList>
+      )}
+  
+      {/* Toolbar fixed at the bottom */}
+      <div className="toolbar">
         <Toolbar />
-
-      </IonContent>
-      
-    </IonPage>
+      </div>
+    </IonContent>
+  </IonPage>
+  
   );
 };
 
