@@ -2,8 +2,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
 
 
-.signup-bg {
-    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+.profile-bg {
+    --background: url('../pages/bg.jpeg') no-repeat center center / cover;
     overflow: hidden;
     padding: auto;
     margin: auto; 
@@ -13,10 +13,11 @@
     flex-direction: column;
     justify-content: start;
     display: flex;
-    height: 92%;
+    height: 83%;
 }
 
 .card1{
+
     width: 95%;
     flex-direction: row;
     display: flex;
@@ -30,8 +31,9 @@
 }
 
 .card2{
+    opacity: 0.85;
     width: 95%;
-    height: 80%;
+    height: 82%;
     flex-direction: column;
     display: flex;
     justify-content: flex-start;

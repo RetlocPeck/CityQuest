@@ -1,10 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 .signup-bg {
-    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    --background: url('../pages/bg2.jpeg') no-repeat center center / cover;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     overflow: hidden;
-    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; 
 }
 
 html,body {
@@ -14,15 +21,16 @@ html,body {
 } 
 .signup-center-con{
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 25%;
-    height:75%
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
     
 }
 
 .signup-card1 {
-    height: 40%;
+    height: 45%;
     width: 80%;
     flex-direction: column;
     display: flex;
@@ -36,17 +44,23 @@ html,body {
 }
 
 .signup-initial-title {
-    font-size: 2.9em;
-    text-align: center;
-    font-family: 'Prompt', sans-serif;
-    margin-bottom: 12px;
+    font-size: 2em;
+        text-align: center;
+        font-family: 'Lato', sans-serif;
+        font-weight: bold;
 }
 
-.signup-initial-title {
-    font-size: 2.9em;
+.signup-initial-body {
+    font-size: 1.3em;
     text-align: center;
-    font-family: 'Prompt', sans-serif;
-    margin-bottom: 0px;
+    font-family: 'Lato', sans-serif;
+    color: #767575;
+    margin-bottom: 12px;
+
+}
+.signup-initial-body.city {
+    margin-bottom:0;
+    font-size: 1.3em;
 }
 
 .signup-buttons {
@@ -61,9 +75,10 @@ html,body {
 
 .signup-textboxes{
     margin-bottom: 12px;
-    border: 1px solid gray;
-    border-radius: 2px;
-   background-color: rgb(213, 212, 212);
+    border: 0px solid gray;
+    border-radius: 4px;
+    height: 40px;
+    background-color: #d9e7f5;
    width: 145%;
    margin-left: -22.5%;
     text-align: center;
@@ -90,29 +105,24 @@ html,body {
     text-align: center;
     font-size: 1.1em;
 }
+
 .signup-hover-solid {
     color: white; 
-    background-color: #FF6C5F; 
+    background-color: #363636; 
     border-radius: 12px;
-    width: 90%;
-    margin-left: 10px;
-    margin-right: 10px;
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    width: 88%;  
+    font-family: 'Lato', sans-serif;
     font-size: 1.2em;
+    margin-top: 10px;
+    text-transform:none;
+    max-width: 100%;
+    text-align: center;
 }
 
-.signup-hover-solid.wide {
-margin-top: 12px;
-    width: 50%;
-    margin-left: 0px;
-    margin-right: 0px;
-
-}
-.signup-hover-solid.wide:hover {
-    --background: #fc4332; 
-    --border-radius: 12px;
+.signup-hover-solid:hover {
+    background-color: #545454;
+    border-radius: 12px;
     color: white; 
-
 }
 
 .signup-topalign{

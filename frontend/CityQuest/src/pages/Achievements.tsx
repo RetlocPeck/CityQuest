@@ -62,8 +62,9 @@ const Achievements: React.FC = () => {
             
           </IonCard>
           </div>
+          <Toolbar/>
         </IonContent>
-        <Toolbar/>
+       
       </IonPage>
       
       {loadingState ? (

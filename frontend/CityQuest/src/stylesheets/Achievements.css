@@ -1,9 +1,7 @@
-
-@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 .a-initial-bg {
-    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    --background: url('../pages/bg.jpeg') no-repeat center center / cover;
 
     overflow: hidden;
     padding: auto;
@@ -15,11 +13,11 @@
     justify-content: center;
     align-items: center;
     display: flex;
-    margin-top: 15%;
-    height: 92%;
+    height: 90%;
 }
 
 .a-card{
+    opacity: 0.85;
     width: 95%;
     flex-direction: column;
     display: flex;
@@ -36,7 +34,7 @@
     align-items: flex-start;
     font-size: 1.9em;
     text-align: center;
-    font-family: 'Prompt', sans-serif;
+    font-family: 'Lato', sans-serif;
     color: #000000;
   
 }

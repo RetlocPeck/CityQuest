@@ -1,6 +1,12 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+
 html, body {
   overflow: hidden;
   height: 100%;
+}
+
+ion-toolbar {
+    --background: transparent; /* Make the IonToolbar background transparent */
 }

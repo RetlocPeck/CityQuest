@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
-@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 .settings-bg {
-    --background: linear-gradient(to bottom, #0571d3, #bad4ec);
+    --background: url('../pages/bg.jpeg') no-repeat center center / cover;
     overflow: hidden;
     padding: auto;
     margin: auto; 
@@ -20,6 +18,7 @@
 }
 
 .settings-main-card{
+
     width: 95%;
     flex-direction: column;
     display: flex;
@@ -36,23 +35,51 @@
     align-items: flex-start;
     font-size: 1.9em;
     text-align: center;
-    font-family: 'Prompt', sans-serif;
+    font-family: 'Lato', sans-serif;
     color: #000000;
 }
-.settings-buttons{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+
+.label {
+    display: inline-block;
+    padding: 10px 20px;      /* Add some padding inside the bubble */
+    border-radius: 15px;     /* Round the corners for the bubble effect */
+    background-color: #c66f80; /* Use the color you prefer for the bubble */
+    color: white;            /* White text color */
+    font-size: 16px;         /* Text size */
+    max-width: 200px;        /* Optional: Set a max width to prevent the bubble from stretching too far */
+    word-wrap: break-word;   /* Ensure long words are wrapped to the next line */
+    position: relative;      /* For positioning the "tail" of the bubble */
+    margin-left: 30%;
+    margin-bottom:5%;
+}
+
+.label::after {
+    content: '';             /* Creates an empty element */
+    position: absolute;      /* Position the tail */
+    bottom: -10px;           /* Position below the bubble */
+    left: 15px;              /* Adjust position of the tail */
+    width: 0;                /* Create a triangle shape */
+    height: 0;
+    border-left: 10px solid transparent; /* Left side of the tail */
+    border-right: 10px solid transparent; /* Right side of the tail */
+    border-top: 10px solid #c66f80; /* Triangle pointing upwards to create the tail */
+}
+
+.settings-buttons {
+    color: white; 
+    background-color: #363636; 
+    border-radius: 12px;
+    font-family: 'Lato', sans-serif;
+    font-size: 1.2em;
+    margin-top: 10px;
     width: 100%;
- 
-        color: white; 
-        background-color: #FF6C5F; 
-        border-radius: 12px;
-        width: 90%;
-        margin-left: 10px;
-        margin-right: 10px;
-        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-        font-size: 1.2em;
-    
-    
+
+    text-transform:none;
+    text-align: center;
+}
+
+.settings-buttons:hover {
+    background-color: #545454;
+    border-radius: 12px;
+    color: white; 
 }

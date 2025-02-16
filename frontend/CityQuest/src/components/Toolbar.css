@@ -1,12 +1,18 @@
-.bg{
-    color: white;
-    background-color: rgb(207, 28, 76);
+
+.bg {
+    color: rgba(0, 0, 255, 0);
+    background-color: #c66f80;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 50px; 
+    height: 80px; 
+    margin-left: 8px;
+    margin-right: 8px;
+
 }
 
-.tool-button{
+.tool-button {
     padding-left: 25px;
     padding-right: 25px;
 }

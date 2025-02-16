@@ -19,7 +19,7 @@ import {
 import ExploreContainer from "../components/ExploreContainer";
 
 import "../stylesheets/Initial.css";
-import star from "./sparkles.gif";
+import star from "./pin.png";
 
 import React, { useState } from 'react';
 import { login } from '../services/authService';
@@ -55,21 +55,25 @@ const Initial: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage >
       <IonContent fullscreen className="initial-initial-bg">
 
         <div className="initial-center-con">
-        <img src= {star} alt="Star animation" style = {{width: "150px"}} />
           {/*TOP CARD*/}
           <IonCard className="initial-card1">
+          <img src= {star} alt="Star animation" style = {{width: "70px"}} />
+
             {/*CITY QUEST LABEL*/}
             <IonCardHeader>
               <IonCardTitle className="initial-initial-title">
-                CityQuest
+                Sign in with email
+              </IonCardTitle>
+              <IonCardTitle className="initial-initial-body">
+                Get started exploring your city and seeing the world
               </IonCardTitle>
             </IonCardHeader>
 
-            <IonCardContent className="initial-topalign">
+            <IonCardContent >
               {/*TOP CARD BUTTONS*/}
               <div className="initial-buttons">
               {/*USERNAME*/}
@@ -80,7 +84,7 @@ const Initial: React.FC = () => {
                   className = "initial-input"
                     type="text"
                     value={email}
-                    placeholder="Username"
+                    placeholder="Email"
                     onIonInput={(e) => setEmail(e.detail.value!)}
                   />
                 </IonItem>
@@ -95,25 +99,11 @@ const Initial: React.FC = () => {
                     onIonInput={(e) => setPassword(e.detail.value!)}
                   />
                 </IonItem>
-                <IonButton className="initial-hover-solid wide" fill="clear" onClick={handleLogin}>
-                  Log In
+                <IonButton className="initial-hover-solid" fill="clear" onClick={handleLogin}>
+                  Get Started
                 </IonButton>
-              </div>
+     </div>
             </IonCardContent>
-          </IonCard>
-          <div className="initial-or-container">
-  <div className="initial-line"></div>
-  <span className="initial-or-text">or</span>
-  <div className="initial-line"></div>
-</div>
-
-          {/*BOTTOM CARD*/}
-          <IonCard className="initial-card2">
-            <IonRouterLink routerLink="/sign-up">
-              <IonButton className="initial-hover-solid signup" fill="clear">
-                Sign Up
-              </IonButton>
-            </IonRouterLink>
           </IonCard>
         </div>
       </IonContent>

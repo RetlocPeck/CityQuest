@@ -8,6 +8,7 @@ import {
   IonCardContent,
   IonCard,
   IonCardHeader,
+    IonRouterLink,
   IonRow,
   IonCol,
   IonCardTitle,
@@ -20,7 +21,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { signUp } from '../services/authService';
 import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
-import star from "./sparkles.gif";
+import star from "./pin.png";
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -81,18 +82,24 @@ const goToHome = () => {
     <IonPage>
       <IonContent fullscreen className="signup-bg">
       <div className="signup-center-con">
-      <img src= {star} alt="Star animation" style = {{width: "150px"}} />
+    
 
         <IonCard className="signup-card1">
+        <img src= {star} alt="Star animation" style = {{width: "70px"}} />
           <IonCardHeader>
-            <IonCardTitle className="signup-initial-title">CityQuest</IonCardTitle>
+            <IonCardTitle className="signup-initial-title">Sign Up</IonCardTitle>
+            <IonCardTitle className="signup-initial-body">Create your account or {" "}
+  <IonRouterLink routerLink="/initial">
+    log in
+  </IonRouterLink></IonCardTitle>
+
           </IonCardHeader>
 
           <IonCardContent className="signup-topalign">
             <div className="signup-buttons">
               
                 <input className="signup-textboxes"
-                placeholder="First Name"
+                placeholder="Name"
                   type="text"
                   value={formData.firstName}
                   onChange={(e) =>
@@ -100,14 +107,8 @@ const goToHome = () => {
                   }
                 />
       
-              <input className="signup-textboxes"
-                placeholder="Last Name"
-                type="text"
-                value={formData.lastSecond}
-                onChange={(e) =>
-                  setFormData({ ...formData, lastSecond: e.target.value })
-                }
-              />
+             
+              
               <input className="signup-textboxes"
                 placeholder="Email"
                 type="text"
@@ -128,7 +129,7 @@ const goToHome = () => {
               </IonCardContent>
               </IonCard>
               <IonCard className="signup-card2">
-              <IonCardHeader className = "signup-citybox">
+              <IonCardHeader className = "signup-initial-body city">
                   Enter your current city below:
               </IonCardHeader>
                   <IonCardContent className="signup-topalign">

@@ -7,10 +7,11 @@ const Home: React.FC = () => {
   return (
     <>
     <IonPage>
-     <IonContent fullscreen>
-     <IonSearchbar style={{ paddingTop: "16px", '--border-radius': '20px', "--height": "60px", }}>
+     <IonContent fullscreen className = "home-bg">
+     <IonSearchbar style={{ paddingTop: "16px", '--border-radius': '20px', "--height": "60px", }} color = "medium">
         </IonSearchbar>
-    
+    <div className="home-center-con"> 
+    </div>
       {/**
        * 
        * Map will be on this screen
@@ -18,10 +19,10 @@ const Home: React.FC = () => {
        * Add a toolbar at bottom that contains buttons for:
        * - Acccount, Achievments
        */}
-       
+        <Toolbar />
 
       </IonContent>
-      <Toolbar />
+     
     </IonPage>
     
     </>

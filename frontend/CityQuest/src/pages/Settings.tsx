@@ -40,7 +40,8 @@ import {
           </IonButton>
 
           <div className="cog-center">
-        <img src={cog}  alt="Cog animation" style={{ width: "150px" }}/>
+          <div className="label">Hi, user! </div>
+        <img src={cog}  alt="Cog animation" style={{ width: "100px" }}/>
        
 
         
@@ -55,14 +56,11 @@ import {
             <IonCardContent>
               <IonRow>
                 <IonCol>
-                  <IonButton fill = "clear" className = "settings-buttons">Change Username</IonButton>
+                    
+                  <IonButton fill = "clear" className = "settings-buttons"  >Change Name</IonButton>
                 </IonCol>
               </IonRow>
-              <IonRow>
-                <IonCol>
-                  <IonButton fill = "clear" className = "settings-buttons">Change Email</IonButton>
-                </IonCol>
-              </IonRow>
+        
               <IonRow>
                 <IonCol>
                   <IonButton fill = "clear" className = "settings-buttons">Change Password</IonButton>

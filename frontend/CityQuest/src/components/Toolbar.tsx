@@ -8,7 +8,7 @@ import { mapOutline, starOutline, personOutline} from "ionicons/icons";
 const Toolbar = () => {
     return (
         <>
-        <IonToolbar  >
+        <IonToolbar  color = "clear">
             <div className = "bg">
             <IonButton
             className = "tool-button"

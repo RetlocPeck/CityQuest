@@ -34,11 +34,11 @@ const Profile: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className="signup-bg">
+      <IonContent fullscreen className="profile-bg">
         <IonToolbar color="clear">
           <IonButton
             size="large"
-            color="warning"
+            color="dark"
             fill="clear"
             routerLink="/home"
           >
@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
 
           <IonButton
             slot="end"
-            color="warning"
+            color="dark"
             fill="clear"
             routerLink="/settings"
             size="large"
@@ -79,8 +79,10 @@ const Profile: React.FC = () => {
             ))}
           </IonCard>
         </div>
+     
+        <Toolbar />
       </IonContent>
-      <Toolbar />
+      
     </IonPage>
   );
 };
