@@ -39,6 +39,10 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 // Helper function: round to 4 decimals (roughly 11 meters)
 const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Saves a visited location (rounded to 4 decimals) in localStorage,
  * ensuring no duplicate entries.
@@ -56,6 +60,11 @@ const saveVisitedLocation = async (longitude: number, latitude: number) => {
     city?: string;
     state?: string;
   }[] = stored ? JSON.parse(stored) : [];
+
+  console.log(localStorage.longitude);
+  console.log(localStorage.latitude);
+  console.log(longitude);
+  console.log(latitude);
   
   const exists = visitedLocations.some(
     (loc) => loc.longitude === longitude && loc.latitude === latitude
@@ -277,8 +286,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
               await updateDoc(userDocRef, {
                 distanceTravelled: newDistance,  // Add the new distance
               });
-              console.log("updated db");
-
+        
               console.log('Distance updated in Firestore:', newDistance);
             } else {
               console.warn('User document does not exist.');
@@ -287,9 +295,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
             console.error('Error updating distance in Firestore:', error);
           }
         } else {
-          previousLatitude.current = rawLat;
-          previousLongitude.current = rawLon;
-          //console.warn('No authenticated user found.');
+          console.warn('No authenticated user found.');
         }
       }
     
@@ -306,7 +312,181 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       });
     
       // Save the visited location
-      saveVisitedLocation(lon, lat);
+      await saveVisitedLocation(lon, lat);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1976 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1977 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1978 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1979 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1980 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1981 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1982 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1983 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1984 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1985 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1986 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1987 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1988 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4415 - .0011, 35.1989 - .0007);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4416 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4417 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4418 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4419 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4420 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4421 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4422 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4423 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4424 - .0011, 35.1975 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1976 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1977 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1978 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1979 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1980 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1981 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1982 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1983 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1984 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1985 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1986 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1987 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1988 - .0007);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4424 - .0011, 35.1989 - .0007);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4432, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1976);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1977);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1978);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1979);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1980);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1981);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1982);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1983);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1984);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1985);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1986);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1987);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1988);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4432, 35.1989);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4432, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4433, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4434, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4435, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4436, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4437, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4438, 35.1975);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4439, 35.1975);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1976);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1977);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1978);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1979);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1980);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1981);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1982);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1983);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1984);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1985);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1986);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1987);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1988);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4439, 35.1989);
+      await sleep(1000);
+
+      await saveVisitedLocation(-97.4432, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4433, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4434, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4435, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4436, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4437, 35.1989);
+      await sleep(1000);
+      await saveVisitedLocation(-97.4438, 35.1989);
+      await sleep(1000);
+
       loadFogOverlay(map);
     };
 
@@ -374,18 +554,6 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       console.log('Map clicked at:', roundedLat, roundedLon);
       userMarker.setLngLat([lng, lat]);
       saveVisitedLocation(roundedLon, roundedLat);
-      handlePositionUpdate({
-        coords: {
-          latitude: lat,
-          longitude: lng,
-          accuracy: 0,
-          altitude: null,
-          altitudeAccuracy: null,
-          heading: null,
-          speed: null,
-        },
-        timestamp: Date.now(),
-      });
       loadFogOverlay(map);
     });
 
