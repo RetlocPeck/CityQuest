@@ -12,6 +12,7 @@ import {
   IonCol,
   IonCardTitle,
 } from "@ionic/react";
+import { useHistory } from "react-router-dom";
 import ExploreContainer from "../components/ExploreContainer";
 import { useEffect, useState } from "react";
 import "../stylesheets/SignUp.css";
@@ -20,11 +21,8 @@ import { signUp } from '../services/authService';
 import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
 import star from "./sparkles.gif";
+
 const SignUp: React.FC = () => {
-
-
-  const validate = () => {};
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastSecond: "",
@@ -33,8 +31,16 @@ const SignUp: React.FC = () => {
     city: "",
   });
 
+const history = useHistory();
+const goToHome = () => {
+  history.push("/home");
+};
+
   const handleSignup = async () => {
       var user;
+      
+
+      
       try {
         const userCredential = await signUp(formData.email, formData.password);
         console.log("Signed up successfully!", userCredential.user);
@@ -46,7 +52,7 @@ const SignUp: React.FC = () => {
           displayName: formData.firstName + " " + formData.lastSecond,
           pinnedCities: [formData.city],
         });
-        //setDoc()
+        goToHome();
       } catch (error) {
         console.error("Signup error:", error);
         // Optionally, show an error message to the user
