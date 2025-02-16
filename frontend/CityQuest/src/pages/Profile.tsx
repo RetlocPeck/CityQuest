@@ -14,23 +14,42 @@ import ".././stylesheets/Profile.css";
 import { useEffect, useState } from "react";
 import { arrowBackOutline, settingsOutline } from "ionicons/icons";
 import Toolbar from "../components/Toolbar";
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
 import star from "./pin.png";
 const Profile: React.FC = () => {
   const [error, setError] = useState(""); //Stores the error message if there is one
-  const [visitationStatuses, setVisitationStatuses] = useState([]); //Stores the current vistation statuses
+  const [name, setName] = useState<string>(""); // Stores the user's name
+  const [email, setEmail] = useState<string>(""); // Stores the user's email
+  const [visitationStatuses, setVisitationStatuses] = useState([]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const results = await fetch("url", {}); // Fetch posts data from the external function
+        const user = auth.currentUser; // Get the currently authenticated user
+        if (user) {
+          // Fetch user data from Firestore
+          const userDocRef = doc(firestore, "users", user.uid); // Reference to the user's document in Firestore
+          const userDocSnap = await getDoc(userDocRef); // Get the document snapshot
+          
+          if (userDocSnap.exists()) {
+            // If document exists, extract the name and email
+            const userData = userDocSnap.data();
+            setName(userData.displayName || "No name found");
+            setEmail(userData.email || "No email found");
+          } else {
+            setError("User data not found.");
+          }
+        }
       } catch (e) {
         console.error(e);
-        setError("Error loading achievements list");
+        setError("Error loading user profile");
       }
     };
     fetchUserProfile();
   }, []);
+
 
   return (
     <IonPage>
@@ -65,8 +84,8 @@ const Profile: React.FC = () => {
               style={{ width: "80px" }}
             />
             <div className="labels">
-              <div className="username">Name:</div>
-              <div className="username">Email:</div>
+              <div className="username">Name: {name}</div>
+              <div className="username">Email: {email}</div>
             </div>
           </IonCard>
           <IonCard className="card2">
@@ -88,3 +107,11 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
+function setEmail(arg0: any) {
+    throw new Error("Function not implemented.");
+}
+
+function setName(arg0: any) {
+    throw new Error("Function not implemented.");
+}
+

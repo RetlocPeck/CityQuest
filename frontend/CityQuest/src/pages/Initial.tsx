@@ -1,68 +1,58 @@
 import {
   IonContent,
-  IonHeader,
   IonPage,
-  IonTitle,
-  IonToolbar,
-  IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonCardTitle,
-  IonRow,
-  IonCol,
-  IonRouterLink,
   IonItem,
-  IonLabel,
-  IonInput
+  IonInput,
+  IonButton,
+  IonText,
+  IonRouterLink,
 } from "@ionic/react";
-import ExploreContainer from "../components/ExploreContainer";
-
+import React, { useState } from 'react';
+import { login } from '../services/authService'; // Import login function
+import { useHistory } from "react-router-dom";
 import "../stylesheets/Initial.css";
 import star from "./pin.png";
 
-import React, { useState } from 'react';
-import { login } from '../services/authService';
-import { useHistory } from "react-router-dom";
-
 const Initial: React.FC = () => {
-
-  /**
-   * TODO:
-   *
-   * Add quick explanation of the product
-   * Add Title Toolbar and fix it to where you pass in custom components
-   */
-
-  const history = useHistory(); // for navigation
+  const history = useHistory(); // For navigation
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>(""); // State for error message
 
   // Function to handle login
   const handleLogin = async () => {
     try {
+      // Attempt login
       const userCredential = await login(email, password);
       console.log("Logged in successfully!", userCredential.user);
-      // Here you could navigate to another page (e.g., using history.push or IonRouter)
+
+      // If successful, redirect to home
       history.push("/home");
     } catch (error: any) {
       console.error("Login error:", error);
-      if (error.code === "auth/invalid-credential") {
-        setPassword("");
+
+      // If login fails, show error message and provide a link to sign-up
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        setErrorMessage(
+          "Invalid credentials. "
+        );
+      } else {
+        setErrorMessage("It looks like these credientials are not found!");
       }
-      // Optionally, show an error message to the user
     }
   };
 
   return (
-    <IonPage >
+    <IonPage>
       <IonContent fullscreen className="initial-initial-bg">
-
         <div className="initial-center-con">
           {/*TOP CARD*/}
           <IonCard className="initial-card1">
-          <img src= {star} alt="Star animation" style = {{width: "70px"}} />
-
+            <img src={star} alt="Star animation" style={{ width: "70px" }} />
             {/*CITY QUEST LABEL*/}
             <IonCardHeader>
               <IonCardTitle className="initial-initial-title">
@@ -73,15 +63,13 @@ const Initial: React.FC = () => {
               </IonCardTitle>
             </IonCardHeader>
 
-            <IonCardContent >
-              {/*TOP CARD BUTTONS*/}
+            <IonCardContent>
+              {/*Login Form*/}
               <div className="initial-buttons">
-              {/*USERNAME*/}
-              {/* Email Input */}
-              <IonItem>
-                  {/* <IonLabel position="floating">Email</IonLabel> */}
+                {/* Email Input */}
+                <IonItem>
                   <IonInput
-                  className = "initial-input"
+                    className="initial-input"
                     type="text"
                     value={email}
                     placeholder="Email"
@@ -90,9 +78,8 @@ const Initial: React.FC = () => {
                 </IonItem>
                 {/* Password Input */}
                 <IonItem>
-                  {/* <IonLabel position="floating">Password</IonLabel> */}
                   <IonInput
-                   className = "initial-input"
+                    className="initial-input"
                     type="password"
                     value={password}
                     placeholder="Password"
@@ -102,7 +89,17 @@ const Initial: React.FC = () => {
                 <IonButton className="initial-hover-solid" fill="clear" onClick={handleLogin}>
                   Get Started
                 </IonButton>
-     </div>
+
+                {/* Display error message if login fails */}
+                {errorMessage && (
+                  <IonText color="danger" className="login-error-message">
+                    {errorMessage}{" "}
+                    <IonRouterLink href={`/sign-up?email=${encodeURIComponent(email)}`} color="primary">
+                      Click here to sign up.
+                    </IonRouterLink>
+                  </IonText>
+                )}
+              </div>
             </IonCardContent>
           </IonCard>
         </div>
