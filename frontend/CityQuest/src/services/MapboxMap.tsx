@@ -81,6 +81,34 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       });
     });
 
+
+     // Function to get the user's current location
+     const getUserLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('User location:', latitude, longitude);
+
+          // Move the map to the user's current location
+          map.flyTo({
+            center: [longitude, latitude],
+            zoom: 16,
+            pitch: 0,
+            bearing: 0,
+          });
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setError('Unable to retrieve location.');
+        },
+        { enableHighAccuracy: true } // High accuracy for more precise location
+      );
+    };
+
+    // Call the geolocation function when the map is loaded
+    map.on('load', () => {
+      getUserLocation(); // Set the map to the user's current location
+    });
     // Handle the location prop (either geocoding a name or using coordinates)
     const queryLocation = async (locationName: string) => {
       try {
