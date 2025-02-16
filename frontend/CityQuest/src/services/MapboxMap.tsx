@@ -277,7 +277,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
               await updateDoc(userDocRef, {
                 distanceTravelled: newDistance,  // Add the new distance
               });
-        
+              console.log("updated db");
+
               console.log('Distance updated in Firestore:', newDistance);
             } else {
               console.warn('User document does not exist.');
@@ -286,7 +287,9 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
             console.error('Error updating distance in Firestore:', error);
           }
         } else {
-          console.warn('No authenticated user found.');
+          previousLatitude.current = rawLat;
+          previousLongitude.current = rawLon;
+          //console.warn('No authenticated user found.');
         }
       }
     
@@ -371,6 +374,18 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       console.log('Map clicked at:', roundedLat, roundedLon);
       userMarker.setLngLat([lng, lat]);
       saveVisitedLocation(roundedLon, roundedLat);
+      handlePositionUpdate({
+        coords: {
+          latitude: lat,
+          longitude: lng,
+          accuracy: 0,
+          altitude: null,
+          altitudeAccuracy: null,
+          heading: null,
+          speed: null,
+        },
+        timestamp: Date.now(),
+      });
       loadFogOverlay(map);
     });
 
