@@ -99,8 +99,8 @@ const Profile: React.FC = () => {
           <IonText className="username">Loading...</IonText> 
         ) : (
             <div className="labels">
-              <div className="username">Name: {name}</div>
-              <div className="username">Email: {email}</div>
+              <div className="username">{name}</div>
+              <div className="email">{email}</div>
             </div>
                 )}
           </IonCard>

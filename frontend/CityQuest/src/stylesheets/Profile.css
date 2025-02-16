@@ -1,9 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
-@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 
 .profile-bg {
-    --background: url('../pages/bg.jpeg') no-repeat center center / cover;
+    --background: url('../pages/bg2.jpeg') no-repeat center center / cover;
     overflow: hidden;
     padding: auto;
     margin: auto; 
@@ -56,10 +55,20 @@
 
 .username{
     margin-left: 40px;
+    font-size: 2.8em;
+    text-align: center;
+    flex-direction: row;
+
+    font-family: 'Lato', sans-serif;
+    color: #000000;
+}
+
+.email{
+    margin-left: 40px;
     font-size: 1.2em;
     text-align: center;
     flex-direction: row;
 
-    font-family: 'Prompt', sans-serif;
-    color: #000000;
+    font-family: 'Lato', sans-serif;
+    color: #3d3d3d;
 }
