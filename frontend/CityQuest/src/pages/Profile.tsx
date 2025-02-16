@@ -1,5 +1,4 @@
 import {
-<<<<<<< HEAD
   IonButton,
   IonIcon,
   IonCard,
@@ -283,7 +282,7 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-=======
+/** 
     IonButton,
     IonIcon,
     IonCard,
@@ -446,7 +445,10 @@ export default Profile;
   <IonRow key={index}>
     <IonCol size="12">
         <div className="progress">
-        <p className = "cityname">{city} </p>{/* City is now a string in this case */}
+<<<<<<< HEAD
+        <p className = "cityname">{city} </p>
+          <p className = "cityname">{city} </p>{/* City is now a string in this case *//**}
+>
       <IonProgressBar className = "bars" value={calculateProgress(city) / 100} />
       <p >{calculateProgress(city).toFixed(2)}% explored</p>
       </div>
@@ -483,4 +485,8 @@ export default Profile;
   
   export default Profile;
   
+<<<<<<< HEAD
 >>>>>>> a59db320262eb63a37f408167b45931b864f87db
+=======
+**/
+

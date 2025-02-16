@@ -1,14 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-<<<<<<< HEAD
-import * as turf from '@turf/turf'; // Other turf functions if needed
-=======
+
+
 import * as turf from '@turf/turf'; // For creating circle polygons
 import { getFirestore, doc, updateDoc, getDoc} from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 // Import the image so the bundler handles its URL correctly
->>>>>>> a59db320262eb63a37f408167b45931b864f87db
+
 import fogTextureImage from '../images/fogTexture.png';
 
 import type { Feature, FeatureCollection, Polygon, MultiPolygon, GeoJsonProperties } from 'geojson';
@@ -22,11 +21,7 @@ interface MapboxMapProps {
   location: string | [number, number];
 }
 
-<<<<<<< HEAD
-/**
- * Rounds a coordinate to 4 decimals (~11 meters accuracy)
- */
-=======
+
 // Helper function: calculate distance between two coordinates
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371e3; // Earth radius in meters
@@ -44,7 +39,7 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 };
 
 // Helper function: round to 4 decimals (roughly 11 meters)
->>>>>>> a59db320262eb63a37f408167b45931b864f87db
+
 const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 
 /**
@@ -215,7 +210,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       map.resize(); // Forces the map to adjust to its container
     });
 
-<<<<<<< HEAD
+
     // 2. Create and add the user marker.
     const userMarkerEl = document.createElement('div');
     userMarkerEl.className = 'user-marker';
@@ -230,7 +225,8 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       .addTo(map);
 
     // 3. On map load, load the fog texture and fog overlay.
-=======
+
+/**
     // Function to get the user's current location
     const getUserLocation = () => {
       navigator.geolocation.getCurrentPosition(
@@ -400,9 +396,14 @@ if (user) {
         console.error('Error updating fog overlay:', err);
       }
     };
+<<<<<<< HEAD
 
     // When the map loads, add the fog overlay.
 >>>>>>> a59db320262eb63a37f408167b45931b864f87db
+=======
+**/
+
+    // 3. On map load, load the fog texture and fog overlay.
     map.on('load', () => {
       map.loadImage(fogTextureImage, (imgError, image) => {
         if (imgError) {
