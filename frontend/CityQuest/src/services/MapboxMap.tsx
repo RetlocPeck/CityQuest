@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import * as turf from '@turf/turf'; // For creating circle polygons
 // Import the image so the bundler handles its URL correctly
 import fogTextureImage from '../images/fogTexture.png';
-
+import pin from '../pages/jump-pin-unscreen.gif';
 import type { FeatureCollection, Feature, Polygon } from 'geojson';
 
 const mapboxvar =
@@ -41,6 +41,7 @@ const saveVisitedLocation = (longitude: number, latitude: number) => {
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     // Create the map
@@ -259,6 +260,22 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     // Add navigation controls.
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+    // Add click event listener to drop a pin
+    map.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+
+      // Create a custom marker element with the GIF
+      const markerElement = document.createElement('div');
+      markerElement.style.width = '50px';
+      markerElement.style.height = '50px';
+      markerElement.style.backgroundImage = `url(${pin})`;
+      markerElement.style.backgroundSize = 'cover';
+
+      new mapboxgl.Marker(markerElement)
+        .setLngLat([lng, lat])
+        .addTo(map);
+    });
+
     return () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
@@ -268,9 +285,9 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   }, [location]);
 
   return (
-    <div>
+    <div style={{ width: '100%', height: '100%' }}>
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div ref={mapContainer} style={{ width: '100%', height: '900px' }} />
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };
