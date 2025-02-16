@@ -23,23 +23,62 @@ const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
 /**
  * Saves a visited location (rounded to 4 decimals) in localStorage,
  * ensuring no duplicate entries.
+ *
+ * This function now also performs a reverse geocoding lookup so that
+ * the city and state at the given coordinates are saved along with the
+ * longitude, latitude, and timestamp.
  */
-const saveVisitedLocation = (longitude: number, latitude: number) => {
+const saveVisitedLocation = async (longitude: number, latitude: number) => {
   const stored = localStorage.getItem('visitedLocations');
-  const visitedLocations: { longitude: number; latitude: number; timestamp: string }[] =
-    stored ? JSON.parse(stored) : [];
+  const visitedLocations: {
+    longitude: number;
+    latitude: number;
+    timestamp: string;
+    city?: string;
+    state?: string;
+  }[] = stored ? JSON.parse(stored) : [];
+  
   const exists = visitedLocations.some(
     (loc) => loc.longitude === longitude && loc.latitude === latitude
   );
+  
   if (!exists) {
-    const newEntry = {
-      longitude,
-      latitude,
-      timestamp: new Date().toISOString(),
-    };
-    visitedLocations.push(newEntry);
-    localStorage.setItem('visitedLocations', JSON.stringify(visitedLocations));
-    console.log('New location saved:', newEntry);
+    // Build the reverse geocoding URL using Mapbox's API.
+    // We request both "place" (city) and "region" (state) types.
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxAccessToken}&types=place,region`;
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      let city = "";
+      let state = "";
+      
+      // Iterate over the returned features to find city and state.
+      if (data.features && Array.isArray(data.features)) {
+        for (const feature of data.features) {
+          if (feature.place_type && feature.place_type.includes("place") && !city) {
+            city = feature.text;
+          }
+          if (feature.place_type && feature.place_type.includes("region") && !state) {
+            state = feature.text;
+          }
+          if (city && state) break;
+        }
+      }
+      
+      const newEntry = {
+        longitude,
+        latitude,
+        city,
+        state,
+        timestamp: new Date().toISOString(),
+      };
+      visitedLocations.push(newEntry);
+      localStorage.setItem('visitedLocations', JSON.stringify(visitedLocations));
+      console.log('New location saved:', newEntry);
+    } catch (err) {
+      console.error("Error during reverse geocoding", err);
+    }
   }
 };
 
@@ -80,8 +119,7 @@ const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
     ];
     const square = turf.polygon([squareCoords]);
 
-    // Use the imported difference function.
-    // Note: This function is expected to take (polygon1, polygon2) as arguments.
+    // Subtract the square from the fog geometry.
     const diff = turf.difference(turf.featureCollection([fogGeometry, square]));
     if (diff) {
       fogGeometry = diff as Feature<Polygon | MultiPolygon>;
@@ -182,6 +220,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       map.setCenter([rawLon, rawLat]);
       userMarker.setLngLat([rawLon, rawLat]);
 
+      // Save the visited location (reverse geocoding runs in the background).
       saveVisitedLocation(lon, lat);
       loadFogOverlay(map);
     };
