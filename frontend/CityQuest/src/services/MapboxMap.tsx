@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as turf from '@turf/turf'; // For creating circle polygons
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 // Import the image so the bundler handles its URL correctly
 import fogTextureImage from '../images/fogTexture.png';
 import pin from '../pages/jump-pin-unscreen.gif';
@@ -15,6 +17,22 @@ mapboxgl.accessToken = mapboxvar;
 interface MapboxMapProps {
   location: string | [number, number];
 }
+
+// Helper function: calculate distance between two coordinates
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const R = 6371e3; // Earth radius in meters
+  const phi_1 = (lat1 * Math.PI) / 180;
+  const phi_2 = (lat2 * Math.PI) / 180;
+  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
+  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+    Math.cos(phi_1) * Math.cos(phi_2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
+};
 
 // Helper function: round to 4 decimals (roughly 11 meters)
 const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
@@ -44,6 +62,9 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const [error, setError] = useState<string | null>(null);
   const [markers, setMarkers] = useState<{ marker: mapboxgl.Marker; lng: number; lat: number }[]>([]);
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const previousLatitude = useRef<number | null>(null);
+  const previousLongitude = useRef<number | null>(null);
+  const [distanceTraveled, setDistanceTraveled] = useState(0);
 
   useEffect(() => {
     // Create the map
@@ -56,13 +77,40 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       bearing: 0,
       attributionControl: false,
     });
+    map.on("load", () => {
+      map.resize(); // Forces the map to adjust to its container
+    });
 
     // Function to get the user's current location
     const getUserLocation = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log('User location:', latitude, longitude);
+          if (previousLatitude.current !== null && previousLongitude.current !== null) {
+            const distance = calculateDistance(
+              previousLatitude.current,
+              previousLongitude.current,
+              latitude,
+              longitude
+            );
+            setDistanceTraveled((prevDistance) => prevDistance + distance);
+
+            // Update the distanceTravelled field in Firebase
+            const auth = getAuth();
+            const user = auth.currentUser;
+            console.log('User:', user);
+            if (user) {
+              const db = getFirestore();
+              const userDocRef = doc(db, 'users', user.uid);
+              updateDoc(userDocRef, {
+                distanceTravelled: distanceTraveled + distance,
+              });
+            }
+          }
+
+          // Update previous coordinates
+          previousLatitude.current = latitude;
+          previousLongitude.current = longitude;
 
           // Move the map to the user's current location
           map.flyTo({
@@ -94,6 +142,52 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         { enableHighAccuracy: true } // High accuracy for more precise location
       );
     };
+
+    // Function to handle map click and update user position
+    const handleMapClick = (e: mapboxgl.MapMouseEvent) => {
+      const { lng: longitude, lat: latitude } = e.lngLat;
+      console.log('Clicked at:', longitude, latitude);
+
+      // Calculate distance if previous coordinates are available
+      if (previousLatitude.current !== null && previousLongitude.current !== null) {
+        const distance = calculateDistance(
+          previousLatitude.current,
+          previousLongitude.current,
+          latitude,
+          longitude
+        );
+        setDistanceTraveled((prevDistance) => prevDistance + distance);
+
+        // Update the distanceTravelled field in Firebase
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (user) {
+          const db = getFirestore();
+          const userDocRef = doc(db, 'users', user.uid);
+          updateDoc(userDocRef, {
+            distanceTravelled: distanceTraveled + distance,
+          });
+        }
+      }
+
+      // Update previous coordinates
+      previousLatitude.current = latitude;
+      previousLongitude.current = longitude;
+
+      // Move the map to the new location
+      map.flyTo({
+        center: [longitude, latitude],
+        zoom: 16,
+        pitch: 40,
+        bearing: 0,
+      });
+
+      // Save the visited location
+      saveVisitedLocation(longitude, latitude);
+    };
+
+    // Add click event listener to the map
+    map.on('click', handleMapClick);
 
     // This function reads visited locations from localStorage and updates the fog overlay.
     const updateFogOverlay = () => {
