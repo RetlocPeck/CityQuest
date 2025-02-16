@@ -6,7 +6,8 @@ import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 // Import the image so the bundler handles its URL correctly
 import fogTextureImage from '../images/fogTexture.png';
-
+import pin from '../pages/jump-pin-unscreen.gif';
+import arrow from '../pages/arrow.png';
 import type { FeatureCollection, Feature, Polygon } from 'geojson';
 
 const mapboxvar =
@@ -58,7 +59,9 @@ const saveVisitedLocation = (longitude: number, latitude: number) => {
 
 export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<{ marker: mapboxgl.Marker; lng: number; lat: number }[]>([]);
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const previousLatitude = useRef<number | null>(null);
   const previousLongitude = useRef<number | null>(null);
   const [distanceTraveled, setDistanceTraveled] = useState(0);
@@ -116,6 +119,21 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
             pitch: 40,
             bearing: 0,
           });
+
+          // Create or update the user marker
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            const userMarkerElement = document.createElement('div');
+            userMarkerElement.style.width = '50px';
+            userMarkerElement.style.height = '50px';
+            userMarkerElement.style.backgroundImage = `url(${arrow})`;
+            userMarkerElement.style.backgroundSize = 'cover';
+
+            userMarkerRef.current = new mapboxgl.Marker(userMarkerElement)
+              .setLngLat([longitude, latitude])
+              .addTo(map);
+          }
         },
         (error) => {
           console.error('Error getting location:', error);
@@ -299,6 +317,11 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
           const latitude = roundCoordinate(rawLatitude);
           saveVisitedLocation(longitude, latitude);
           updateFogOverlay();
+
+          // Update the user marker position
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          }
         },
         (geoError) => {
           console.error('Geolocation error:', geoError);
@@ -353,6 +376,22 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     // Add navigation controls.
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+    // Add click event listener to drop a pin
+    map.on('click', (e) => {
+      const { lng, lat } = e.lngLat;
+
+      // Create a custom marker element with the GIF
+      const markerElement = document.createElement('div');
+      markerElement.style.width = '50px';
+      markerElement.style.height = '50px';
+      markerElement.style.backgroundImage = `url(${pin})`;
+      markerElement.style.backgroundSize = 'cover';
+
+      new mapboxgl.Marker(markerElement)
+        .setLngLat([lng, lat])
+        .addTo(map);
+    });
+
     return () => {
       if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
@@ -362,9 +401,9 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
   }, [location]);
 
   return (
-    <div>
+    <div style={{ width: '100%', height: '100%' }}>
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      <div ref={mapContainer} style={{ width: '100%', height: '900px' }} />
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };
