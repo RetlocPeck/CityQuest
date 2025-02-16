@@ -2,6 +2,7 @@ import { IonButton, IonIcon, IonCard, IonCol, IonContent, IonHeader, IonPage, Io
 import '.././stylesheets/Profile.css';
 import { useEffect, useState } from 'react';
 import { arrowBackOutline, settingsOutline } from 'ionicons/icons';
+import Toolbar from '../components/Toolbar';
 
 const Profile: React.FC = () => {
 
@@ -55,8 +56,9 @@ const Profile: React.FC = () => {
             ))}
 
         </IonCard>
-        
+       
     </IonContent>
+    <Toolbar />
     </IonPage>
   );
 };

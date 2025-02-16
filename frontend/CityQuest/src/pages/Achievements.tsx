@@ -13,9 +13,11 @@ import {
   IonCol,
   IonRouterLink,
 } from "@ionic/react";
+import Toolbar from '../components/Toolbar';
+
 import ExploreContainer from "../components/ExploreContainer";
+import pin from "./pin.png";
 import star from "./star.gif";
-import shadow from "./shadow.png";
 import "../stylesheets/Achievements.css";
 import { useEffect, useState } from "react";
 
@@ -41,10 +43,18 @@ const Achievements: React.FC = () => {
       <IonPage>
         <IonContent className="a-initial-bg">
           <div className="star">
-            <img src={star} alt="Star animation" style={{ width: "200px"}} />
+             {/**
+          <div style={{ position: "relative", display: "inline-block" }}>
+  <img src={pin} alt="Pin" style={{ width: "150px", position: "relative", zIndex: 2 }} />
+  <img src={sparkles} alt="Sparkles" 
+       style={{ width: "150px", position: "absolute", top: 0, left: 0, zIndex: 1 }} />
+</div>
+*/}
+   <img src={star} alt="Star animation" style={{ width: "150px"}} />
         
           <IonCard className="a-card"> 
           <div className="a-card-title"> Achievements </div>
+          
 
  {/**
                  * CARDS GO HERE!!!!!!!
@@ -53,6 +63,7 @@ const Achievements: React.FC = () => {
           </IonCard>
           </div>
         </IonContent>
+        <Toolbar/>
       </IonPage>
       
       {loadingState ? (

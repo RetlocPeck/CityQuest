@@ -19,9 +19,8 @@ import {
   import { signUp } from '../services/authService';
   import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
-import star from "./star.gif";
-
-const SignUp: React.FC = () => {
+  import star from "./sparkles.gif";
+  const SignUp: React.FC = () => {
 
 
   const validate = () => {};
