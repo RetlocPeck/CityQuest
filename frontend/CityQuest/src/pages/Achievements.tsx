@@ -67,18 +67,6 @@ const Achievements: React.FC = () => {
         description: "Stay awake past midnight for a week.",
         imageUrl: pin,
       },
-      {
-        id: 6,
-        title: "Photographer",
-        description: "Take 200 photos.",
-        imageUrl: pin,
-      },
-      {
-        id: 7,
-        title: "World Traveler",
-        description: "Visit 50 countries.",
-        imageUrl: pin,
-      },
     ];
   
     const handleCompletion = (id: number) => {
