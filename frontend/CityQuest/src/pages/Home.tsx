@@ -1,21 +1,16 @@
-import { IonButton, IonCard, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonCard, IonContent, IonHeader, IonPage, IonSearchbar, IonTitle, IonToolbar } from '@ionic/react';
 import ExploreContainer from '../components/ExploreContainer';
 import '.././stylesheets/Home.css';
+import Toolbar from '../components/Toolbar';
 
 const Home: React.FC = () => {
   return (
+    <>
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Blank</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+     <IonContent fullscreen>
+     <IonSearchbar style={{ paddingTop: "16px", '--border-radius': '20px', "--height": "60px", }}>
+        </IonSearchbar>
+    
       {/**
        * 
        * Map will be on this screen
@@ -23,14 +18,14 @@ const Home: React.FC = () => {
        * Add a toolbar at bottom that contains buttons for:
        * - Acccount, Achievments
        */}
-       <IonCard>
-        <IonToolbar>
-          <IonButton>Account</IonButton>
-          <IonButton>Achievments</IonButton>
-        </IonToolbar>
-        </IonCard>
+       
+
       </IonContent>
+      <Toolbar />
     </IonPage>
+    
+    </>
+    
   );
 };
 

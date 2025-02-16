@@ -1,0 +1,12 @@
+.bg{
+    color: white;
+    background-color: rgb(207, 28, 76);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tool-button{
+    padding-left: 25px;
+    padding-right: 25px;
+}
