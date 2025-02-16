@@ -24,7 +24,7 @@ import { app, analytics, auth, firestore, storage } from '../firebase-config';
 
 
 
-import star from "./sparkles.gif";
+import star from "../assets/sparkles.gif";
 
 
 const SignUp: React.FC = () => {
@@ -93,9 +93,6 @@ const goToHome = () => {
     <IonPage>
       <IonContent fullscreen className="signup-bg">
       <div className="signup-center-con">
-
-      <img src= {star} alt="Star animation" style = {{width: "150px"}} />
-
 
         <IonCard className="signup-card1">
         <img src= {star} alt="Star animation" style = {{width: "70px"}} />

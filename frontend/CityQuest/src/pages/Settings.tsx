@@ -18,7 +18,7 @@ import {
   import { auth, firestore } from '../firebase-config'; // Ensure you have firebase-config setup correctly
   import { updateProfile, updatePassword } from "firebase/auth";
   import { doc, setDoc, getDoc } from "firebase/firestore";
-  import cog from "./nanner.gif";
+  import cog from "../assets/nanner.gif";
 
   const Settings: React.FC = () => {
     const [isEditingName, setIsEditingName] = useState<boolean>(false); 
