@@ -68,12 +68,14 @@ const Achievements: React.FC = () => {
         title: "Getting the Hang of It",
         description: "Level up for the first time.",
         imageUrl: pin,
+        criteria: 100000,
       },
       {
         id: 5,
         title: "Night Owl",
         description: "Stay awake past midnight for a week.",
         imageUrl: pin,
+        criteria: 100000,
       },
     ];
   
@@ -122,6 +124,7 @@ const Achievements: React.FC = () => {
       return () => unsubscribe();
     }, []);
 
+
   return (
     <>
       <IonPage>
@@ -139,7 +142,6 @@ const Achievements: React.FC = () => {
                 <IonCol size="6" key={achievement.id}>
                  <div
                     className="achievement-item"
-                    onClick={() => handleCompletion(achievement.id)}
                   >
                    <img
                       src={achievement.imageUrl}
