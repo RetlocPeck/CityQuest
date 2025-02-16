@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
-import dotenv from 'dotenv';
-dotenv.config();
-mapboxgl.accessToken = process.env.MAP_BOX_TOKEN;
+const mapboxvar = "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
+mapboxgl.accessToken = mapboxvar;
 
 export const MapboxMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null); // Reference to the div that will contain the map
