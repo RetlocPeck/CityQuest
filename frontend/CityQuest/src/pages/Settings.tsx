@@ -17,6 +17,8 @@ import {
   import { useEffect, useState } from "react";
   import "../stylesheets/Settings.css";
   import { arrowBackOutline } from "ionicons/icons";
+  import cog from "./nanner.gif";
+
   
   const Settings: React.FC = () => {
 
@@ -24,40 +26,51 @@ import {
   
     return (
       <IonPage>
-        <IonContent fullscreen className="signup-bg">
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Account Settings</IonTitle>
-            </IonToolbar>
-          </IonHeader>
-          <IonCard className="main-card">
-            <IonCardHeader>
-              <IonToolbar>
-              <IonButton size='large' fill='clear' routerLink='/home'>
-              <IonIcon icon={arrowBackOutline}></IonIcon>
-            </IonButton>
-              </IonToolbar>
+        <IonContent fullscreen className="settings-bg">
+     
+        
 
-              <IonCardTitle>Edit Profile</IonCardTitle>
+        <IonButton
+            size="large"
+            color="warning"
+            fill="clear"
+            routerLink="/profile"
+          >
+            <IonIcon icon={arrowBackOutline}></IonIcon>
+          </IonButton>
+
+          <div className="cog-center">
+        <img src={cog}  alt="Cog animation" style={{ width: "150px" }}/>
+       
+
+        
+          <IonCard className = "settings-main-card">
+            
+            <IonCardHeader>
+        
+                
+
+              <IonCardTitle className = "settings-title">Edit Profile</IonCardTitle>
             </IonCardHeader>
             <IonCardContent>
               <IonRow>
                 <IonCol>
-                  <IonButton expand="block">Change Username</IonButton>
+                  <IonButton fill = "clear" className = "settings-buttons">Change Username</IonButton>
                 </IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>
-                  <IonButton expand="block">Change Email</IonButton>
+                  <IonButton fill = "clear" className = "settings-buttons">Change Email</IonButton>
                 </IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>
-                  <IonButton expand="block">Change Password</IonButton>
+                  <IonButton fill = "clear" className = "settings-buttons">Change Password</IonButton>
                 </IonCol>
               </IonRow>
             </IonCardContent>
           </IonCard>
+          </div>
         </IonContent>
        
       </IonPage>
