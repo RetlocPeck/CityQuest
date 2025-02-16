@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400&display=swap');
 
 .signup-bg {
-    --background: url('../pages/bg2.jpeg') no-repeat center center / cover;
+    --background: url('../assets/bg2.jpeg') no-repeat center center / cover;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

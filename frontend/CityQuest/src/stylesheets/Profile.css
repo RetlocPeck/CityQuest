@@ -2,7 +2,7 @@
 
 
 .profile-bg {
-    --background: url('../pages/bg2.jpeg') no-repeat center center / cover;
+    --background: url('../assets/bg2.jpeg') no-repeat center center / cover;
     overflow: hidden;
     padding: auto;
     margin: auto; 
@@ -42,7 +42,7 @@
     flex-direction: column;
     display: flex;
     justify-content: flex-start;
-    align-items: center;
+    align-items: flex-start;
     text-align: center;
     padding: 16px;
     border-radius: 16px;
@@ -71,4 +71,40 @@
 
     font-family: 'Lato', sans-serif;
     color: #3d3d3d;
+}
+
+.profile-hover-solid {
+    color: white; 
+    background-color: #363636; 
+    border-radius: 12px;
+    width: 88%;  
+    font-family: 'Lato', sans-serif;
+    font-size: 1.2em;
+    margin-top: 10px;
+    text-transform:none;
+    max-width: 35%;
+    text-align: center;
+}
+
+.profile-hover-solid:hover {
+    background-color: #545454;
+    border-radius: 12px;
+    color: white; 
+}
+
+.progress{
+    flex-direction: column;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    
+
+}
+.cityname{
+    font-size: large;
+    color: rgb(33, 33, 33);
+}
+
+.bars{
+    width: 350px;
 }
