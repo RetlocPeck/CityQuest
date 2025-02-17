@@ -7,7 +7,7 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDu1Az6NgjLN9O2dt-7u6uBOPBmxaSOTuk",
+  apiKey: "firebaseAPIKey",
   authDomain: "cityquest-ff8e9.firebaseapp.com",
   projectId: "cityquest-ff8e9",
   storageBucket: "cityquest-ff8e9.firebasestorage.app",
