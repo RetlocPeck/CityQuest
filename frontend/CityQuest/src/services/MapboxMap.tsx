@@ -13,7 +13,7 @@ import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson'
 
 // Mapbox access token
 const mapboxAccessToken =
-  "pk.eyJ1IjoiaGFyaXZhbnNoOSIsImEiOiJjbTc2d3F4OWcwY3BkMmtvdjdyYTh3emR4In0.t9BVaGQAT7kqU8AAfWnGOA";
+  "MapboxAPIKey";
 mapboxgl.accessToken = mapboxAccessToken;
 
 interface MapboxMapProps {
