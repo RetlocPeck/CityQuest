@@ -208,7 +208,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       container: mapContainer.current as HTMLElement,
       style: 'mapbox://styles/mapbox/streets-v11',
       center: [-97.4395, 35.2226], // Norman, OK
-      zoom: 16,
+      zoom: 19,
       pitch: 40,
       bearing: 0,
       attributionControl: false,
@@ -299,7 +299,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       // Fly to the new location.
       map.flyTo({
         center: [lon, lat],
-        zoom: 16,
+        zoom: 19,
         pitch: 40,
         bearing: 0,
       });
@@ -343,7 +343,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         const [longitude, latitude] = data.features[0].center;
         map.flyTo({
           center: [longitude, latitude],
-          zoom: 18,
+          zoom: 19,
           pitch: 40,
           speed: 0.8,
           curve: 1,
@@ -356,7 +356,7 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     if (Array.isArray(location)) {
       map.flyTo({
         center: location,
-        zoom: 16,
+        zoom: 19,
         pitch: 40,
       });
     } else if (typeof location === 'string') {
@@ -367,16 +367,16 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // 9. On map click, update the user location, save it, and update the fog.
-    map.on('click', (e) => {
-      const { lng, lat } = e.lngLat;
-      const roundedLon = roundCoordinate(lng);
-      const roundedLat = roundCoordinate(lat);
+    // map.on('click', (e) => {
+    //   const { lng, lat } = e.lngLat;
+    //   const roundedLon = roundCoordinate(lng);
+    //   const roundedLat = roundCoordinate(lat);
 
-      console.log('Map clicked at:', roundedLat, roundedLon);
-      userMarker.setLngLat([lng, lat]);
-      saveVisitedLocation(roundedLon, roundedLat);
-      loadFogOverlay(map);
-    });
+    //   console.log('Map clicked at:', roundedLat, roundedLon);
+    //   userMarker.setLngLat([lng, lat]);
+    //   saveVisitedLocation(roundedLon, roundedLat);
+    //   loadFogOverlay(map);
+    // });
 
     // 10. Cleanup: stop geolocation watch, save the current session's path into savedPaths,
     // and clear the activePath so that the next session starts fresh.
@@ -398,12 +398,12 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         let newSavedFeature;
         if (activePath.length === 1) {
           const pt = turf.point([activePath[0].longitude, activePath[0].latitude]);
-          newSavedFeature = turf.buffer(pt, 0.1, { units: 'kilometers' });
+          newSavedFeature = turf.buffer(pt, 0.01, { units: 'kilometers' });
         } else {
           const lineCoords = activePath.map((loc) => [loc.longitude, loc.latitude]);
           const line = turf.lineString(lineCoords);
           const bezierLine = turf.bezierSpline(line);
-          newSavedFeature = turf.buffer(bezierLine, 0.1, { units: 'kilometers' });
+          newSavedFeature = turf.buffer(bezierLine, 0.01, { units: 'kilometers' });
         }
         // Retrieve any previously saved paths.
         let savedPaths: any[] = [];
