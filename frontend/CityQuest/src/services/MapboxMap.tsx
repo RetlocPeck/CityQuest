@@ -372,61 +372,61 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // 9. On map click, update the user location, save it, and update the fog.
-    map.on('click', async (e) => {
-      const rawLon = e.lngLat.lng;
-      const rawLat = e.lngLat.lat;
-      const lon = roundCoordinate(rawLon);
-      const lat = roundCoordinate(rawLat);
+  //   map.on('click', async (e) => {
+  //     const rawLon = e.lngLat.lng;
+  //     const rawLat = e.lngLat.lat;
+  //     const lon = roundCoordinate(rawLon);
+  //     const lat = roundCoordinate(rawLat);
   
-      console.log("Map clicked at:", lat, lon);
+  //     console.log("Map clicked at:", lat, lon);
   
-      // Fetch nearby roads from Mapbox Tile Query API
-      const roadQueryUrl = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${lon},${lat}.json?radius=15&layers=road&access_token=${mapboxAccessToken}`;
+  //     // Fetch nearby roads from Mapbox Tile Query API
+  //     const roadQueryUrl = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${lon},${lat}.json?radius=15&layers=road&access_token=${mapboxAccessToken}`;
   
-      let snappedLon = lon;
-      let snappedLat = lat;
+  //     let snappedLon = lon;
+  //     let snappedLat = lat;
   
-      try {
-          const response = await fetch(roadQueryUrl);
-          const data = await response.json();
+  //     try {
+  //         const response = await fetch(roadQueryUrl);
+  //         const data = await response.json();
   
-          if (data.features && data.features.length > 0) {
-              // Extract the first (nearest) road feature
-              const nearestRoad = data.features[0];
+  //         if (data.features && data.features.length > 0) {
+  //             // Extract the first (nearest) road feature
+  //             const nearestRoad = data.features[0];
   
-              if (nearestRoad.geometry.type === "Point") {
-                  const [roadLon, roadLat] = nearestRoad.geometry.coordinates;
+  //             if (nearestRoad.geometry.type === "Point") {
+  //                 const [roadLon, roadLat] = nearestRoad.geometry.coordinates;
   
-                  const distance = turf.distance(
-                      turf.point([lon, lat]),
-                      turf.point([roadLon, roadLat]),
-                      { units: "meters" }
-                  );
+  //                 const distance = turf.distance(
+  //                     turf.point([lon, lat]),
+  //                     turf.point([roadLon, roadLat]),
+  //                     { units: "meters" }
+  //                 );
   
-                  if (distance <= 10) {
-                      snappedLon = roadLon;
-                      snappedLat = roadLat;
-                      console.log(`Snapped to road (distance: ${distance.toFixed(2)}m):`, snappedLat, snappedLon);
-                  } else {
-                      console.log(`Click is off-road (distance: ${distance.toFixed(2)}m), keeping clicked location.`);
-                  }
-              } else {
-                  console.log("No valid road point found, keeping clicked location.");
-              }
-          } else {
-              console.log("No nearby roads found, keeping clicked location.");
-          }
-      } catch (error) {
-          console.error("Error fetching road data:", error);
-      }
+  //                 if (distance <= 10) {
+  //                     snappedLon = roadLon;
+  //                     snappedLat = roadLat;
+  //                     console.log(`Snapped to road (distance: ${distance.toFixed(2)}m):`, snappedLat, snappedLon);
+  //                 } else {
+  //                     console.log(`Click is off-road (distance: ${distance.toFixed(2)}m), keeping clicked location.`);
+  //                 }
+  //             } else {
+  //                 console.log("No valid road point found, keeping clicked location.");
+  //             }
+  //         } else {
+  //             console.log("No nearby roads found, keeping clicked location.");
+  //         }
+  //     } catch (error) {
+  //         console.error("Error fetching road data:", error);
+  //     }
   
-      // Update marker position
-      userMarker.setLngLat([snappedLon, snappedLat]);
+  //     // Update marker position
+  //     userMarker.setLngLat([snappedLon, snappedLat]);
   
-      // Save the new coordinate to the active session path and update fog overlay
-      saveVisitedLocation(snappedLon, snappedLat);
-      loadFogOverlay(map);
-  });
+  //     // Save the new coordinate to the active session path and update fog overlay
+  //     saveVisitedLocation(snappedLon, snappedLat);
+  //     loadFogOverlay(map);
+  // });
   
 
     // 10. Cleanup: stop geolocation watch, save the current session's path into savedPaths,
