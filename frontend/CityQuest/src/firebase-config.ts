@@ -6,15 +6,7 @@ import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "firebaseAPIKey",
-  authDomain: "cityquest-ff8e9.firebaseapp.com",
-  projectId: "cityquest-ff8e9",
-  storageBucket: "cityquest-ff8e9.firebasestorage.app",
-  messagingSenderId: "886064600094",
-  appId: "1:886064600094:web:11b1153ab513cfb4914a0f",
-  measurementId: "G-385N6VZZ51"
-};
+const firebaseConfig = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG!);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

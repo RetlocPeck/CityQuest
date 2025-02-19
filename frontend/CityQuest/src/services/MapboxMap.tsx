@@ -12,8 +12,7 @@ import fogTextureImage from '../images/fogTexture.png';
 import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson';
 
 // Mapbox access token
-const mapboxAccessToken =
-  "MapboxAPIKey";
+const mapboxAccessToken = import.meta.env.VITE_MAPBOX_API_KEY!;
 mapboxgl.accessToken = mapboxAccessToken;
 
 interface MapboxMapProps {

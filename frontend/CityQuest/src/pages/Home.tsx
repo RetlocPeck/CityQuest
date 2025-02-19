@@ -20,7 +20,7 @@ const Home: React.FC = () => {
     setSearchQuery(query);
     
     if (query && query.length > 2) {
-      const accessToken = "mapboxAPIKey"; 
+      const accessToken = import.meta.env.VITE_MAPBOX_API_KEY!; 
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${accessToken}`;
       
       try {

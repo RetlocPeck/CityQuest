@@ -1,6 +1,4 @@
-// /c:/Users/hluch/Documents/OU/Spring2025/Hacklahoma/CityQuest/frontend/CityQuest/src/services/mapBoxService.ts
-
-const mapBoxToken = 'your-mapbox-token-here';
+const mapBoxToken = import.meta.env.VITE_MAPBOX_API_KEY!;
 
 export const getMapBoxToken = (): string => {
     return mapBoxToken;
