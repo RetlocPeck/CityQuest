@@ -141,7 +141,7 @@ const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
     if (activePath.length === 1) {
       // Only one coordinate: create a 100m circle.
       const pt = turf.point([activePath[0].longitude, activePath[0].latitude]);
-      bufferedFeature = turf.buffer(pt, 0.1, { units: 'kilometers' });
+      bufferedFeature = turf.buffer(pt, 0.01, { units: 'kilometers' });
     } else {
       // Two or more coordinates: create a line, smooth with a Bezier, then buffer by 100m.
       const lineCoords = activePath.map((loc) => [loc.longitude, loc.latitude]);
