@@ -12,7 +12,7 @@ yarn-debug.log*
 # Firebase
 firebase-debug.log
 .firebaserc
-firebase.json
+# firebase.json
 .firestore/
 .firebase/
 
