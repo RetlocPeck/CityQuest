@@ -33,13 +33,13 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
   return R * c;
 };
 
-// Helper: Round coordinate to 4 decimals (≈11m resolution)
-const roundCoordinate = (coord: number) => Number(coord.toFixed(4));
+// Helper: Round coordinate to 6 decimals
+const roundCoordinate = (coord: number) => Number(coord.toFixed(6));
 
 /**
  * Instead of using "visitedLocations", we now use "activePath".
  * Every time a new coordinate is available, we add it to the current session’s
- * activePath. (We also do a reverse geocode lookup for optional city/state info.)
+ * activePath.
  */
 const saveVisitedLocation = async (longitude: number, latitude: number) => {
   // Get the active path from localStorage
@@ -55,33 +55,9 @@ const saveVisitedLocation = async (longitude: number, latitude: number) => {
     (loc) => loc.longitude === longitude && loc.latitude === latitude
   );
   if (!exists) {
-    // (Optional) Reverse geocode to get city and state
-    let city = "";
-    let state = "";
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxAccessToken}&types=place,region`;
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.features && Array.isArray(data.features)) {
-        for (const feature of data.features) {
-          if (feature.place_type && feature.place_type.includes("place") && !city) {
-            city = feature.text;
-          }
-          if (feature.place_type && feature.place_type.includes("region") && !state) {
-            state = feature.text;
-          }
-          if (city && state) break;
-        }
-      }
-    } catch (err) {
-      console.error("Error during reverse geocoding", err);
-    }
     const newEntry = {
       longitude,
       latitude,
-      city,
-      state,
-      timestamp: new Date().toISOString(),
     };
     activePath.push(newEntry);
     localStorage.setItem('activePath', JSON.stringify(activePath));
@@ -96,9 +72,9 @@ const saveVisitedLocation = async (longitude: number, latitude: number) => {
  *   b) The current active session (from "activePath")
  *
  * For each session:
- * - If only one point exists, we create a 100m circle.
+ * - If only one point exists, we create a 30m circle.
  * - If at least two points exist, we form a line (sorted by timestamp), smooth it
- *   using turf.bezierSpline(), and then buffer it by 100m.
+ *   using turf.bezierSpline(), and then buffer it by 30m.
  */
 const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
   // 1. Outer polygon covering the entire world.
@@ -139,15 +115,15 @@ const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
     );
     let bufferedFeature: Feature<Polygon | MultiPolygon> | undefined;
     if (activePath.length === 1) {
-      // Only one coordinate: create a 100m circle.
+      // Only one coordinate: create a 30m circle.
       const pt = turf.point([activePath[0].longitude, activePath[0].latitude]);
-      bufferedFeature = turf.buffer(pt, 0.02, { units: 'kilometers' });
+      bufferedFeature = turf.buffer(pt, 0.03, { units: 'kilometers' });
     } else {
-      // Two or more coordinates: create a line, smooth with a Bezier, then buffer by 100m.
+      // Two or more coordinates: create a line, smooth with a Bezier, then buffer by 30m.
       const lineCoords = activePath.map((loc) => [loc.longitude, loc.latitude]);
       const line = turf.lineString(lineCoords);
       const bezierLine = turf.bezierSpline(line);
-      bufferedFeature = turf.buffer(bezierLine, 0.02, { units: 'kilometers' });
+      bufferedFeature = turf.buffer(bezierLine, 0.03, { units: 'kilometers' });
     }
 
     if (bufferedFeature) {
@@ -302,12 +278,12 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
       previousLongitude.current = snappedLon;
   
       // Fly to the new location smoothly
-      map.flyTo({
-          center: [snappedLon, snappedLat],
-          zoom: 19,
-          pitch: 40,
-          bearing: 0,
-      });
+      // map.flyTo({
+      //     center: [snappedLon, snappedLat],
+      //     zoom: 19,
+      //     pitch: 40,
+      //     bearing: 0,
+      // });
   
       // Save the new coordinate and update fog overlay
       saveVisitedLocation(snappedLon, snappedLat);
@@ -372,61 +348,61 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // 9. On map click, update the user location, save it, and update the fog.
-  //   map.on('click', async (e) => {
-  //     const rawLon = e.lngLat.lng;
-  //     const rawLat = e.lngLat.lat;
-  //     const lon = roundCoordinate(rawLon);
-  //     const lat = roundCoordinate(rawLat);
+    map.on('click', async (e) => {
+      const rawLon = e.lngLat.lng;
+      const rawLat = e.lngLat.lat;
+      const lon = roundCoordinate(rawLon);
+      const lat = roundCoordinate(rawLat);
   
-  //     console.log("Map clicked at:", lat, lon);
+      console.log("Map clicked at:", lat, lon);
   
-  //     // Fetch nearby roads from Mapbox Tile Query API
-  //     const roadQueryUrl = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${lon},${lat}.json?radius=15&layers=road&access_token=${mapboxAccessToken}`;
+      // Fetch nearby roads from Mapbox Tile Query API
+      const roadQueryUrl = `https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/tilequery/${lon},${lat}.json?radius=15&layers=road&access_token=${mapboxAccessToken}`;
   
-  //     let snappedLon = lon;
-  //     let snappedLat = lat;
+      let snappedLon = lon;
+      let snappedLat = lat;
   
-  //     try {
-  //         const response = await fetch(roadQueryUrl);
-  //         const data = await response.json();
+      try {
+          const response = await fetch(roadQueryUrl);
+          const data = await response.json();
   
-  //         if (data.features && data.features.length > 0) {
-  //             // Extract the first (nearest) road feature
-  //             const nearestRoad = data.features[0];
+          if (data.features && data.features.length > 0) {
+              // Extract the first (nearest) road feature
+              const nearestRoad = data.features[0];
   
-  //             if (nearestRoad.geometry.type === "Point") {
-  //                 const [roadLon, roadLat] = nearestRoad.geometry.coordinates;
+              if (nearestRoad.geometry.type === "Point") {
+                  const [roadLon, roadLat] = nearestRoad.geometry.coordinates;
   
-  //                 const distance = turf.distance(
-  //                     turf.point([lon, lat]),
-  //                     turf.point([roadLon, roadLat]),
-  //                     { units: "meters" }
-  //                 );
+                  const distance = turf.distance(
+                      turf.point([lon, lat]),
+                      turf.point([roadLon, roadLat]),
+                      { units: "meters" }
+                  );
   
-  //                 if (distance <= 10) {
-  //                     snappedLon = roadLon;
-  //                     snappedLat = roadLat;
-  //                     console.log(`Snapped to road (distance: ${distance.toFixed(2)}m):`, snappedLat, snappedLon);
-  //                 } else {
-  //                     console.log(`Click is off-road (distance: ${distance.toFixed(2)}m), keeping clicked location.`);
-  //                 }
-  //             } else {
-  //                 console.log("No valid road point found, keeping clicked location.");
-  //             }
-  //         } else {
-  //             console.log("No nearby roads found, keeping clicked location.");
-  //         }
-  //     } catch (error) {
-  //         console.error("Error fetching road data:", error);
-  //     }
+                  if (distance <= 10) {
+                      snappedLon = roadLon;
+                      snappedLat = roadLat;
+                      console.log(`Snapped to road (distance: ${distance.toFixed(2)}m):`, snappedLat, snappedLon);
+                  } else {
+                      console.log(`Click is off-road (distance: ${distance.toFixed(2)}m), keeping clicked location.`);
+                  }
+              } else {
+                  console.log("No valid road point found, keeping clicked location.");
+              }
+          } else {
+              console.log("No nearby roads found, keeping clicked location.");
+          }
+      } catch (error) {
+          console.error("Error fetching road data:", error);
+      }
   
-  //     // Update marker position
-  //     userMarker.setLngLat([snappedLon, snappedLat]);
+      // Update marker position
+      userMarker.setLngLat([snappedLon, snappedLat]);
   
-  //     // Save the new coordinate to the active session path and update fog overlay
-  //     saveVisitedLocation(snappedLon, snappedLat);
-  //     loadFogOverlay(map);
-  // });
+      // Save the new coordinate to the active session path and update fog overlay
+      saveVisitedLocation(snappedLon, snappedLat);
+      loadFogOverlay(map);
+  });
   
 
     // 10. Cleanup: stop geolocation watch, save the current session's path into savedPaths,
@@ -449,12 +425,12 @@ export const MapboxMap: React.FC<MapboxMapProps> = ({ location }) => {
         let newSavedFeature;
         if (activePath.length === 1) {
           const pt = turf.point([activePath[0].longitude, activePath[0].latitude]);
-          newSavedFeature = turf.buffer(pt, 0.02, { units: 'kilometers' });
+          newSavedFeature = turf.buffer(pt, 0.03, { units: 'kilometers' });
         } else {
           const lineCoords = activePath.map((loc) => [loc.longitude, loc.latitude]);
           const line = turf.lineString(lineCoords);
           const bezierLine = turf.bezierSpline(line);
-          newSavedFeature = turf.buffer(bezierLine, 0.02, { units: 'kilometers' });
+          newSavedFeature = turf.buffer(bezierLine, 0.03, { units: 'kilometers' });
         }
         // Retrieve any previously saved paths.
         let savedPaths: any[] = [];
