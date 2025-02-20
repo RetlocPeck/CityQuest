@@ -2,6 +2,12 @@
 node_modules/
 npm-debug.log
 yarn-error.log
+yarn-debug.log*
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
 # Firebase
 firebase-debug.log
@@ -48,6 +54,24 @@ logs/
 # Mapbox
 mapbox-token.json
 
+# testing
+/coverage
+
+# production
+/dist
+
 # Miscellaneous
 *.swp
 *.swo
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/.nx
+/.nx/cache
+/.vscode/*
+!/.vscode/extensions.json
+.idea
+
+# Optional eslint cache
+.eslintcache
