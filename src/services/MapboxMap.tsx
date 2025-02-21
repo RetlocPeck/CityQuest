@@ -3,7 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import * as turf from '@turf/turf'; // For spatial operations like buffering and smoothing
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import fogTextureImage from '../images/fogTextureDark.png';
 
@@ -95,6 +95,7 @@ const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
   let fogGeometry: Feature<Polygon | MultiPolygon> = turf.polygon([outerRing]);
 
   // Process previously saved paths.
+  // TODO: Process previously saved segments from Firestore.
   let savedPaths: any[] = [];
   try {
     savedPaths = JSON.parse(localStorage.getItem('savedPaths') || '[]');
