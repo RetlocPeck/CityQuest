@@ -3,11 +3,12 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import * as turf from '@turf/turf'; // For spatial operations like buffering and smoothing
-import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, where, query, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import fogTextureImage from '../images/fogTextureDark.png';
 
 import type { Feature, FeatureCollection, Polygon, MultiPolygon } from 'geojson';
+import { firestore } from '../firebase-config';
 
 // Set Mapbox access token
 const mapboxAccessToken = import.meta.env.VITE_MAPBOX_API_KEY!;
@@ -96,17 +97,36 @@ const generateFogGeometry = (): FeatureCollection<Polygon | MultiPolygon> => {
 
   // Process previously saved paths.
   // TODO: Process previously saved segments from Firestore.
-  let savedPaths: any[] = [];
-  try {
-    savedPaths = JSON.parse(localStorage.getItem('savedPaths') || '[]');
-  } catch (e) {
-    savedPaths = [];
-  }
-  savedPaths.forEach((feature: any) => {
-    const diff = turf.difference(turf.featureCollection([fogGeometry, feature]));
-    if (diff) {
-      fogGeometry = diff;
+  const db = getFirestore();
+  const userId: string | undefined = getAuth().currentUser?.uid;
+
+  if (!userId) {
+    throw new Error("No user is logged in...")
+  };
+
+  const getUserSegment = async (userId: string) => {
+    const q = query(collection(db, "segments"), where("userId", "==", userId));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      return querySnapshot.docs[0].data(); // Get first matching doc
+    } else {
+      return { // else return blank doc...
+        userId: userId,
+        startTimestamp: null,
+        endTimestamp: null,
+        points: [],
+      }
     }
+  };
+
+  getUserSegment(userId).then((userSegments) => {
+    userSegments.points.forEach((feature: any) => {
+      const diff = turf.difference(turf.featureCollection([fogGeometry, feature]));
+      if (diff) {
+        fogGeometry = diff;
+      }
+    });
   });
 
   // Process the active path.
